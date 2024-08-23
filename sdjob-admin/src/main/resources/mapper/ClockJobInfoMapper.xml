@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.miniclock.admin.core.mapper.ClockJobInfoMapper">
+
+
+    <insert id="save">
+
+    </insert>
+
+    <select id="loadByName" resultType="com.miniclock.admin.core.model.ClockJobInfo">
+
+    </select>
+    <select id="findAll" resultType="com.miniclock.admin.core.model.ClockJobInfo">
+
+    </select>
+    <select id="scheduleJobQuery" resultType="com.miniclock.admin.core.model.ClockJobInfo">
+
+    </select>
+</mapper>
