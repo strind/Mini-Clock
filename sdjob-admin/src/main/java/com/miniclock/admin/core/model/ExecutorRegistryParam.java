@@ -8,6 +8,7 @@ import java.io.Serializable;
  * @description 调度中心持有的执行器注册信息
  */
 public class ExecutorRegistryParam implements Serializable {
+
     public static final long SerialVersionUID = -1L;
 
     // 定时任务的名字
