@@ -1,6 +1,7 @@
-package com.miniclock.admin.core.trigger;
+package com.miniclock.admin.core.thread;
 
-import com.miniclock.admin.core.model.ClockJobInfo;
+import com.miniclock.admin.core.trigger.SdJobTrigger;
+import com.miniclock.admin.core.trigger.TriggerTypeEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,7 +11,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * @author strind
  * @date 2024/8/23 19:40
- * @description
+ * @description 初始化快慢线程池，执行调用定时任务
  */
 public class JobTriggerPoolHelper {
 
@@ -26,6 +27,9 @@ public class JobTriggerPoolHelper {
     // 开启线程池
     public static void toStart(){
         helper.start();
+    }
+    public static void toStop(){
+        helper.stop();
     }
 
     private void start() {
@@ -70,14 +74,15 @@ public class JobTriggerPoolHelper {
     // key - 定时任务的id， value - 慢执行的次数
     // 每分钟清空一次，循环使用
     private volatile ConcurrentMap<Integer, AtomicInteger> jobTimeoutCountMap = new ConcurrentHashMap<>();
-    public static void trigger(ClockJobInfo jobInfo){
-        helper.addTrigger(jobInfo);
+    public static void triggerr(int jobId, TriggerTypeEnum triggerType, int failRetryCount, String executorShardingParam, String executorParam, String addressList){
+        helper.addTrigger(jobId,triggerType,failRetryCount,executorShardingParam,executorParam, addressList);
     }
 
-    public void addTrigger(ClockJobInfo jobInfo){
+    public void addTrigger(int jobId, TriggerTypeEnum triggerType, int failRetryCount, String executorShardingParam, String executorParam, String addressList){
         ThreadPoolExecutor defaultPool = fastTriggerPool;
-        AtomicInteger timeoutCount = jobTimeoutCountMap.get(jobInfo.getId());
+        AtomicInteger timeoutCount = jobTimeoutCountMap.get(jobId);
         if (timeoutCount != null && timeoutCount.get() > 10){
+            // 一分钟的执行慢次数超过10次
             defaultPool = slowTriggerPool;
         }
 
@@ -86,7 +91,7 @@ public class JobTriggerPoolHelper {
             () -> {
                 long start = System.currentTimeMillis();
                 try {
-                    JobTrigger.trigger(jobInfo);
+                    SdJobTrigger.trigger(jobId,triggerType,failRetryCount,executorShardingParam, executorParam,addressList);
                 }catch (Exception e){
                     logger.error(e.getMessage(),e);
                 }finally {
@@ -98,8 +103,7 @@ public class JobTriggerPoolHelper {
                     }
                     long cost = System.currentTimeMillis() - start;
                     if (cost > 500){
-                        AtomicInteger count = jobTimeoutCountMap.putIfAbsent(jobInfo.getId(),
-                            new AtomicInteger(1));
+                        AtomicInteger count = jobTimeoutCountMap.putIfAbsent(jobId, new AtomicInteger(1));
                         if (count != null){
                             timeoutCount.incrementAndGet();
                         }

@@ -1,64 +1,101 @@
-package com.miniclock.admin.core.trigger;
+package com.miniclock.core.util;
 
-import com.miniclock.admin.core.model.ClockJobInfo;
 import com.miniclock.core.model.ReturnT;
-import com.miniclock.core.util.GsonTool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.net.ssl.*;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 
 /**
  * @author strind
- * @date 2024/8/23 19:42
- * @description
+ * @date 2024/8/24 9:35
+ * @description SdJob用于远程调用的工具类
  */
-public class JobTrigger {
 
-    public static final Logger logger = LoggerFactory.getLogger(JobTrigger.class);
+public class SdJobRemotingUtil {
 
-    public static void trigger(ClockJobInfo jobInfo){
+    private static Logger logger = LoggerFactory.getLogger(SdJobRemotingUtil.class);
 
+    public static final String SD_JOB_ACCESS_TOKEN = "XXL-JOB-ACCESS-TOKEN";
+
+
+    /**
+     * 信任该http链接
+     */
+    private static void trustAllHosts(HttpsURLConnection connection) {
+        try {
+            SSLContext sc = SSLContext.getInstance("TLS");
+            sc.init(null, trustAllCerts, new java.security.SecureRandom());
+            SSLSocketFactory newFactory = sc.getSocketFactory();
+            connection.setSSLSocketFactory(newFactory);
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        }
+        connection.setHostnameVerifier(new HostnameVerifier() {
+            @Override
+            public boolean verify(String hostname, SSLSession session) {
+                return true;
+            }
+        });
     }
 
-    private static void processTrigger(ClockJobInfo jobInfo){
-        TriggerParam param = new TriggerParam();
-        param.setExecutorName(jobInfo.getJobName());
-        String ip = jobInfo.getIps().get(0);
-        runExecutor(param,ip);
-    }
 
-    private static ReturnT runExecutor(TriggerParam triggerParam, String address){
-        //将消息发送给执行定时任务的程序
-        //在这个方法中把消息发送给定时任务执行程序
+    private static final TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager() {
+        @Override
+        public X509Certificate[] getAcceptedIssuers() {
+            return new X509Certificate[]{};
+        }
+        @Override
+        public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+        }
+        @Override
+        public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+        }
+    }};
+
+
+    /**
+     * 发送post消息
+     */
+    public static ReturnT postBody(String url, String accessToken, int timeout, Object requestObj, Class returnTargClassOfT) {
         HttpURLConnection connection = null;
         BufferedReader bufferedReader = null;
         try {
             //创建链接
-            URL realUrl = new URL(address);
-            //得到连接
+            URL realUrl = new URL(url);
             connection = (HttpURLConnection) realUrl.openConnection();
-            //设置连接属性
-            //post请求
+            //判断是不是https开头的
+            boolean useHttps = url.startsWith("https");
+            if (useHttps) {
+                HttpsURLConnection https = (HttpsURLConnection) connection;
+                trustAllHosts(https);
+            }
             connection.setRequestMethod("POST");
             connection.setDoOutput(true);
             connection.setDoInput(true);
             connection.setUseCaches(false);
-            connection.setReadTimeout(3 * 1000);
+            connection.setReadTimeout(timeout * 1000);
             connection.setConnectTimeout(3 * 1000);
             connection.setRequestProperty("connection", "Keep-Alive");
             connection.setRequestProperty("Content-Type", "application/json;charset=UTF-8");
             connection.setRequestProperty("Accept-Charset", "application/json;charset=UTF-8");
+            //判断令牌是否为空
+            if(accessToken!=null && accessToken.trim().length()>0){
+                //设置令牌，以键值对的形式，键就是该类的静态成员变量
+                connection.setRequestProperty(SD_JOB_ACCESS_TOKEN, accessToken);
+            }
             //进行连接
             connection.connect();
-            //判断请求体是否为null
-            if (triggerParam != null) {
-                //序列化请求体，也就是要发送的触发参数
-                String requestBody = GsonTool.toJson(triggerParam);
+            if (requestObj != null) {
+                //序列化请求体，也就是要发送的触发器参数
+                String requestBody = GsonTool.toJson(requestObj);
                 //下面就开始正式发送消息了
                 DataOutputStream dataOutputStream = new DataOutputStream(connection.getOutputStream());
                 dataOutputStream.write(requestBody.getBytes("UTF-8"));
@@ -73,7 +110,6 @@ public class JobTrigger {
                 //设置失败结果
                 return new ReturnT<String>(ReturnT.FAIL_CODE, "xxl-job remoting fail, StatusCode("+ statusCode +") invalid. for url : " + url);
             }
-            //下面就开始接收返回的结果了
             bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
             StringBuilder result = new StringBuilder();
             String line;

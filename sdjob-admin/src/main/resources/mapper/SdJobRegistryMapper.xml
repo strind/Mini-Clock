@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.miniclock.admin.mapper.SdJobRegistryMapper">
+    <insert id="registrySave"></insert>
+    <update id="removeDead"></update>
+    <update id="registryUpdate">
+
+    </update>
+    <delete id="registryDelete"></delete>
+
+    <select id="findDead" resultType="java.lang.Integer">
+
+    </select>
+    <select id="findAll" resultType="com.miniclock.admin.core.model.SdJobRegistry">
+
+    </select>
+</mapper>
