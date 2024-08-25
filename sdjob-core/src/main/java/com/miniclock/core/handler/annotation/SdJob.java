@@ -5,7 +5,7 @@ import java.lang.annotation.*;
 /**
  * @author strind
  * @date 2024/8/24 7:12
- * @description
+ * @description 用在方法上，表明定时任务的名字
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)

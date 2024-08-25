@@ -7,7 +7,7 @@ import java.lang.reflect.Method;
 /**
  * @author strind
  * @date 2024/8/24 7:05
- * @description 具体的定时任务
+ * @description 基于反射执行定时任务
  */
 public class JobHandler extends IJobHandler {
 
