@@ -23,7 +23,7 @@ public class SdJobRemotingUtil {
 
     private static Logger logger = LoggerFactory.getLogger(SdJobRemotingUtil.class);
 
-    public static final String SD_JOB_ACCESS_TOKEN = "XXL-JOB-ACCESS-TOKEN";
+    public static final String SD_JOB_ACCESS_TOKEN = "SD-JOB-ACCESS-TOKEN";
 
 
     /**

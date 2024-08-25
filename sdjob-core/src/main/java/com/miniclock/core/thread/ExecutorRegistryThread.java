@@ -108,4 +108,17 @@ public class ExecutorRegistryThread {
         registryThread.setName("SdJob, executor ExecutorRegistryThread");
         registryThread.start();
     }
+
+    public void toStop() {
+        toStop = true;
+        if (registryThread != null){
+            //中断注册线程
+            registryThread.interrupt();
+            try {
+                registryThread.join();
+            } catch (InterruptedException e) {
+                logger.error(e.getMessage(), e);
+            }
+        }
+    }
 }
