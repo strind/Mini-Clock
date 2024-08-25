@@ -1,7 +1,7 @@
 package com.miniclock.core.biz;
 
-import com.miniclock.core.model.RegistryParam;
-import com.miniclock.core.model.ReturnT;
+import com.miniclock.core.biz.model.RegistryParam;
+import com.miniclock.core.biz.model.ReturnT;
 
 /**
  * @author strind

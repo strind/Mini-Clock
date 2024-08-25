@@ -1,8 +1,8 @@
 package com.miniclock.core.biz.client;
 
 import com.miniclock.core.biz.AdminBiz;
-import com.miniclock.core.model.RegistryParam;
-import com.miniclock.core.model.ReturnT;
+import com.miniclock.core.biz.model.RegistryParam;
+import com.miniclock.core.biz.model.ReturnT;
 import com.miniclock.core.util.SdJobRemotingUtil;
 
 /**

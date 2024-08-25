@@ -14,4 +14,6 @@ public @interface SdJob {
 
     // 定时任务的名字
     String value();
+    String init() default "";
+    String destroy() default "";
 }

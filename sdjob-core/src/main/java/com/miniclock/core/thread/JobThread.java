@@ -1,8 +1,9 @@
 package com.miniclock.core.thread;
 
-import com.miniclock.core.handler.JobHandler;
-import com.miniclock.core.model.ReturnT;
-import com.miniclock.core.model.TriggerParam;
+import com.miniclock.core.handler.IJobHandler;
+import com.miniclock.core.handler.impl.JobHandler;
+import com.miniclock.core.biz.model.ReturnT;
+import com.miniclock.core.biz.model.TriggerParam;
 
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -15,7 +16,8 @@ import java.util.concurrent.TimeUnit;
 public class JobThread extends Thread{
     // 定时任务的id
     private int jobId;
-    private JobHandler jobHandler;
+    // 封装定时任务的对象
+    private IJobHandler jobHandler;
 
     // 上一个任务未执行完，下一个任务就到来了，放入队列，顺序执行
     private LinkedBlockingQueue<TriggerParam> triggerQueue;
@@ -24,6 +26,7 @@ public class JobThread extends Thread{
 
     // 线程的空闲时间
     private int idleTimes = 0;
+    private String stopReason;
 
     public JobThread(int jobId, JobHandler jobHandler){
         this.jobHandler = jobHandler;
@@ -57,5 +60,18 @@ public class JobThread extends Thread{
                 throw new RuntimeException(e);
             }
         }
+    }
+
+    public IJobHandler getJobHandler() {
+        return jobHandler;
+    }
+
+    public void setJobHandler(IJobHandler jobHandler) {
+        this.jobHandler = jobHandler;
+    }
+
+    public void toStop(String removeOldReason) {
+        this.toStop = true;
+        this.stopReason = removeOldReason;
     }
 }

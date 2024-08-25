@@ -17,7 +17,7 @@ import java.util.Map;
 /**
  * @author strind
  * @date 2024/8/24 7:07
- * @description 在spring 容器启动后
+ * @description 执行器的服务入口，在spring 容器启动后
  */
 public class SdJobSpringExecutor extends SdJobExecutor implements ApplicationContextAware, SmartInitializingSingleton {
 
@@ -46,7 +46,8 @@ public class SdJobSpringExecutor extends SdJobExecutor implements ApplicationCon
         if (applicationContext == null){
             return;
         }
-        String[] beanNames = applicationContext.getBeanNamesForType(Object.class);
+        // false 表示不允许是非单例的 true 允许是延迟初始化的
+        String[] beanNames = applicationContext.getBeanNamesForType(Object.class, false, true);
         for (String beanName : beanNames) {
             Object bean = applicationContext.getBean(beanName);
             Map<Method, SdJob> annotationMethod = null;

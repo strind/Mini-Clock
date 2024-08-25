@@ -25,7 +25,7 @@ public class EmbedServer {
 
     public static final Logger logger = LoggerFactory.getLogger(EmbedServer.class);
 
-    public void start(final String address, final int port, final String appName) {
+    public void start(final String address, final int port, final String appName, String accessToken) {
         ThreadPoolExecutor bizThreadPool = new ThreadPoolExecutor(
             0,
             200,
@@ -81,5 +81,9 @@ public class EmbedServer {
                 logger.error(e.getMessage(),e);
             }
         }
+    }
+
+    public void stop() {
+
     }
 }

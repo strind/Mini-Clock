@@ -1,6 +1,6 @@
 package com.miniclock.core.util;
 
-import com.miniclock.core.model.ReturnT;
+import com.miniclock.core.biz.model.ReturnT;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

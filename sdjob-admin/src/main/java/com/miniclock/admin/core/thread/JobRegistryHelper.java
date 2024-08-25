@@ -2,12 +2,10 @@ package com.miniclock.admin.core.thread;
 
 import com.miniclock.admin.core.conf.SdJobAdminConfig;
 import com.miniclock.admin.core.model.SdJobGroup;
-import com.miniclock.admin.core.model.SdJobInfo;
 import com.miniclock.admin.core.model.SdJobRegistry;
-import com.miniclock.admin.mapper.SdJobRegistryMapper;
 import com.miniclock.core.enums.RegistryConfig;
-import com.miniclock.core.model.RegistryParam;
-import com.miniclock.core.model.ReturnT;
+import com.miniclock.core.biz.model.RegistryParam;
+import com.miniclock.core.biz.model.ReturnT;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;

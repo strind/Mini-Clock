@@ -1,7 +1,7 @@
 package com.miniclock.admin.core.route;
 
-import com.miniclock.core.model.ReturnT;
-import com.miniclock.core.model.TriggerParam;
+import com.miniclock.core.biz.model.ReturnT;
+import com.miniclock.core.biz.model.TriggerParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

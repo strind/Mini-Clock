@@ -1,4 +1,4 @@
-package com.miniclock.core.model;
+package com.miniclock.core.biz.model;
 
 import java.io.Serializable;
 

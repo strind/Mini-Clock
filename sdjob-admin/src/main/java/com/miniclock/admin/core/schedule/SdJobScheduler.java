@@ -3,6 +3,7 @@ package com.miniclock.admin.core.schedule;
 import com.miniclock.admin.core.thread.JobScheduleHelper;
 import com.miniclock.admin.core.thread.JobRegistryHelper;
 import com.miniclock.admin.core.thread.JobTriggerPoolHelper;
+import com.miniclock.core.biz.ExecutorBiz;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,6 +20,10 @@ public class SdJobScheduler {
     public static final Logger logger = LoggerFactory.getLogger(SdJobScheduler.class);
 
     private JobScheduleHelper helper = JobScheduleHelper.getInstance();
+
+    public static ExecutorBiz getExecutorBiz(String address) {
+        return null;
+    }
 
     // 初始化调度中心的组件
     public void init() {

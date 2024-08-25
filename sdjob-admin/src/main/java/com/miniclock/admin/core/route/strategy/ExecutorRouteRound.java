@@ -1,8 +1,8 @@
 package com.miniclock.admin.core.route.strategy;
 
 import com.miniclock.admin.core.route.ExecutorRouter;
-import com.miniclock.core.model.ReturnT;
-import com.miniclock.core.model.TriggerParam;
+import com.miniclock.core.biz.model.ReturnT;
+import com.miniclock.core.biz.model.TriggerParam;
 
 import java.util.List;
 import java.util.Random;
