@@ -1,9 +1,11 @@
 package com.miniclock.admin.core.schedule;
 
+import com.miniclock.admin.core.conf.SdJobAdminConfig;
 import com.miniclock.admin.core.thread.JobScheduleHelper;
 import com.miniclock.admin.core.thread.JobRegistryHelper;
 import com.miniclock.admin.core.thread.JobTriggerPoolHelper;
 import com.miniclock.core.biz.ExecutorBiz;
+import com.miniclock.core.biz.client.ExecutorBizClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,9 +23,6 @@ public class SdJobScheduler {
 
     private JobScheduleHelper helper = JobScheduleHelper.getInstance();
 
-    public static ExecutorBiz getExecutorBiz(String address) {
-        return null;
-    }
 
     // 初始化调度中心的组件
     public void init() {
@@ -42,4 +41,21 @@ public class SdJobScheduler {
     }
 
     private static ConcurrentMap<String, ExecutorBiz> executorBizRepository = new ConcurrentHashMap<>();
+
+    public static ExecutorBiz getExecutorBiz(String address) {
+        if (address==null || address.trim().isEmpty()) {
+            return null;
+        }
+        address = address.trim();
+        //从远程调用的Map集合中获得远程调用的客户端
+        ExecutorBiz executorBiz = executorBizRepository.get(address);
+        if (executorBiz != null) {
+            //如果有就直接返回
+            return executorBiz;
+        }
+        executorBiz = new ExecutorBizClient(address, SdJobAdminConfig.getAdminConfig().getAccessToken());
+        //把创建好的客户端放到Map中
+        executorBizRepository.put(address, executorBiz);
+        return executorBiz;
+    }
 }

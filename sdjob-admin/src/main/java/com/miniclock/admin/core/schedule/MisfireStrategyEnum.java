@@ -1,9 +1,6 @@
 package com.miniclock.admin.core.schedule;
 
 
-import com.miniclock.admin.core.util.I18nUtil;
-
-
 /**
  * @author strind
  * @date 2024/8/24 16:42
@@ -12,10 +9,10 @@ import com.miniclock.admin.core.util.I18nUtil;
 public enum MisfireStrategyEnum {
 
     //默认什么也不做
-    DO_NOTHING(I18nUtil.getString("misfire_strategy_do_nothing")),
+    DO_NOTHING("misfire_strategy_do_nothing"),
 
     //失败后重试一次
-    FIRE_ONCE_NOW(I18nUtil.getString("misfire_strategy_fire_once_now"));
+    FIRE_ONCE_NOW("misfire_strategy_fire_once_now");
 
     private String title;
 

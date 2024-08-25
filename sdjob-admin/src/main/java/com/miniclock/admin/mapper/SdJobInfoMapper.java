@@ -15,7 +15,7 @@ public interface SdJobInfoMapper {
 
     // 根据定时任务的名字，查询定时任务信息
     SdJobInfo loadByName(String name);
-    SdJobInfo loadByName(Integer id);
+    SdJobInfo loadById(Integer id);
 
     // 保存任务信息
     Integer save(SdJobInfo jobInfo);
@@ -25,5 +25,6 @@ public interface SdJobInfoMapper {
 
     //
     List<SdJobInfo> scheduleJobQuery(long maxNextTime, int preReadCount);
+
 }
 

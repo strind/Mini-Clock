@@ -8,13 +8,16 @@
 
     </insert>
 
-    <select id="loadByName" resultType="com.miniclock.admin.core.model.ClockJobInfo">
+    <select id="loadByName" resultType="com.miniclock.admin.core.model.SdJobInfo">
 
     </select>
-    <select id="findAll" resultType="com.miniclock.admin.core.model.ClockJobInfo">
+    <select id="findAll" resultType="com.miniclock.admin.core.model.SdJobInfo">
 
     </select>
-    <select id="scheduleJobQuery" resultType="com.miniclock.admin.core.model.ClockJobInfo">
+    <select id="scheduleJobQuery" resultType="com.miniclock.admin.core.model.SdJobInfo">
+
+    </select>
+    <select id="loadById" resultType="com.miniclock.admin.core.model.SdJobInfo">
 
     </select>
 </mapper>

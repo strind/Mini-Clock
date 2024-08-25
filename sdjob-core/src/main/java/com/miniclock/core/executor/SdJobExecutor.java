@@ -101,7 +101,7 @@ public class SdJobExecutor {
         return jobHandlerMap.get(name);
     }
 
-    public static JobThread regisJobThread(int jobId, JobHandler jobHandler, String removeOldReason){
+    public static JobThread regisJobThread(int jobId, IJobHandler jobHandler, String removeOldReason){
         JobThread jobThread = new JobThread(jobId, jobHandler);
         jobThread.start();
         JobThread oldJobThread = jobThreadRepository.put(jobId, jobThread);

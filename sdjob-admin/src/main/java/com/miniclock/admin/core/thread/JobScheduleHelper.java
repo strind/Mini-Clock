@@ -89,7 +89,7 @@ public class JobScheduleHelper {
                     long now_time = System.currentTimeMillis();
                     // 查询所有的任务
                     List<SdJobInfo> jobs = SdJobAdminConfig.getAdminConfig().getJobInfoMapper()
-                        .scheduleJobQuery(now_time + preReadCount, preReadCount)
+                        .scheduleJobQuery(now_time + PRE_READ_MS, preReadCount);
                     if (jobs != null && !jobs.isEmpty()) {
                         for (SdJobInfo job : jobs) {
                             // 任务过期
@@ -125,9 +125,7 @@ public class JobScheduleHelper {
                                 pushTimeRing(ringSecond, job.getId());
                                 refreshNextValidTime(job, new Date(job.getTriggerNextTime()));
                             }
-                        }
-                        // 更新信息
-                        for (SdJobInfo job : jobs) {
+                            // 更新信息
                             SdJobAdminConfig.getAdminConfig().getJobInfoMapper().save(job);
                         }
                     } else {

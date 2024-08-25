@@ -74,7 +74,7 @@ public class JobTriggerPoolHelper {
     // key - 定时任务的id， value - 慢执行的次数
     // 每分钟清空一次，循环使用
     private volatile ConcurrentMap<Integer, AtomicInteger> jobTimeoutCountMap = new ConcurrentHashMap<>();
-    public static void triggerr(int jobId, TriggerTypeEnum triggerType, int failRetryCount, String executorShardingParam, String executorParam, String addressList){
+    public static void trigger(int jobId, TriggerTypeEnum triggerType, int failRetryCount, String executorShardingParam, String executorParam, String addressList){
         helper.addTrigger(jobId,triggerType,failRetryCount,executorShardingParam,executorParam, addressList);
     }
 

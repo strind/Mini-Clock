@@ -1,7 +1,6 @@
 package com.miniclock.admin.core.route.strategy;
 
 import com.miniclock.admin.core.route.ExecutorRouter;
-import com.miniclock.admin.core.util.I18nUtil;
 import com.miniclock.core.biz.model.ReturnT;
 import com.miniclock.core.biz.model.TriggerParam;
 
@@ -10,7 +9,7 @@ import java.util.List;
 /**
  * @author strind
  * @date 2024/8/24 11:13
- * @description 故障转移
+ * @description 故障转移策略
  */
 public class ExecutorRouteFailover extends ExecutorRouter {
 
@@ -25,7 +24,7 @@ public class ExecutorRouteFailover extends ExecutorRouter {
                 beatResult = new ReturnT<>(ReturnT.FAIL_CODE,"" + e);
             }
             sb.append( (sb.length()>0)?"<br><br>":"")
-                .append(I18nUtil.getString("jobconf_beat") + "：")
+                .append("jobconf_beat" + "：")
                 .append("<br>address：").append(address)
                 .append("<br>code：").append(beatResult.getCode())
                 .append("<br>msg：").append(beatResult.getMsg());

@@ -4,10 +4,7 @@ import com.miniclock.core.biz.ExecutorBiz;
 import com.miniclock.core.biz.impl.ExecutorBizImpl;
 import com.miniclock.core.biz.model.ReturnT;
 import com.miniclock.core.biz.model.TriggerParam;
-import com.miniclock.core.executor.SdJobExecutor;
-import com.miniclock.core.handler.impl.JobHandler;
 import com.miniclock.core.thread.ExecutorRegistryThread;
-import com.miniclock.core.thread.JobThread;
 import com.miniclock.core.util.GsonTool;
 import com.miniclock.core.util.SdJobRemotingUtil;
 import io.netty.bootstrap.ServerBootstrap;
@@ -79,7 +76,7 @@ public class EmbedServer {
                                 .addLast(new HttpServerCodec())
                                 // 消息聚合，将拆分传递的消息合在一起
                                 .addLast(new HttpObjectAggregator(5*1024*1024))
-                                .addLast(new embedHttpServerHandler(executorBiz, accessToken,bizThreadPool));
+                                .addLast(new EmbedHttpServerHandler(executorBiz, accessToken,bizThreadPool));
                         }
                     })
                     .childOption(ChannelOption.SO_KEEPALIVE,true);
@@ -112,15 +109,15 @@ public class EmbedServer {
         logger.info(">>>>>>>>>>> SdJob remoting server destroy success.");
     }
 
-    public static class embedHttpServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
+    public static class EmbedHttpServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
 
-        public static final Logger logger = LoggerFactory.getLogger(embedHttpServerHandler.class);
+        public static final Logger logger = LoggerFactory.getLogger(EmbedHttpServerHandler.class);
 
         private ExecutorBiz executorBiz;
 
         private String accessToken;
         private ThreadPoolExecutor bizThreadPool = null;
-        public embedHttpServerHandler(ExecutorBiz executorBiz, String accessToken, ThreadPoolExecutor bizThreadPool) {
+        public EmbedHttpServerHandler(ExecutorBiz executorBiz, String accessToken, ThreadPoolExecutor bizThreadPool) {
             this.accessToken = accessToken;
             this.executorBiz =  executorBiz;
             this.bizThreadPool = bizThreadPool;

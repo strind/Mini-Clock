@@ -5,20 +5,13 @@ import com.miniclock.admin.core.model.SdJobGroup;
 import com.miniclock.admin.core.model.SdJobInfo;
 import com.miniclock.admin.core.route.ExecutorRouteStrategyEnum;
 import com.miniclock.admin.core.schedule.SdJobScheduler;
-import com.miniclock.admin.core.util.I18nUtil;
 import com.miniclock.core.biz.ExecutorBiz;
 import com.miniclock.core.biz.model.ReturnT;
 import com.miniclock.core.biz.model.TriggerParam;
-import com.miniclock.core.util.GsonTool;
 import io.netty.util.internal.ThrowableUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.List;
 
 /**
@@ -49,7 +42,7 @@ public class SdJobTrigger {
     }
 
     private static void processTrigger(SdJobGroup group, SdJobInfo jobInfo, int finalFailRetryCount, TriggerTypeEnum triggerType, int index, int total){
-        ExecutorRouteStrategyEnum executorRouteStrategyEnum = ExecutorRouteStrategyEnum.match(jobInfo.getExecutorRouteStrategy(), null);
+        ExecutorRouteStrategyEnum executorRouteStrategyEnum = ExecutorRouteStrategyEnum.getDefaultIfMatchFail(jobInfo.getExecutorRouteStrategy(), null);
         // 触发器，在执行器那一端使用
         TriggerParam param = new TriggerParam();
         param.setJobId(jobInfo.getId());
@@ -90,7 +83,7 @@ public class SdJobTrigger {
             runResult = new ReturnT<String>(ReturnT.FAIL_CODE, ThrowableUtil.stackTraceToString(e));
         }
         //在这里拼接一下远程调用返回的状态码和消息
-        StringBuffer runResultSB = new StringBuffer(I18nUtil.getString("jobconf_trigger_run") + "：");
+        StringBuffer runResultSB = new StringBuffer("jobconf_trigger_run" + "：");
         runResultSB.append("<br>address：").append(address);
         runResultSB.append("<br>code：").append(runResult.getCode());
         runResultSB.append("<br>msg：").append(runResult.getMsg());

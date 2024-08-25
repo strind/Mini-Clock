@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author strind
  * @date 2024/8/24 9:35
- * @description
+ * @description 执行器进行远程注册的类
  */
 public class ExecutorRegistryThread {
 
@@ -43,6 +43,7 @@ public class ExecutorRegistryThread {
                 try {
                     RegistryParam registryParam = new RegistryParam(RegistryConfig.RegistryType.EXECUTOR.name(), appName,
                         address);
+                    //这里考虑到调度中心也许是以集群的形式存在，所以从集合中得到每一个和调度中心通话地客户端，然后发送注册消息即可
                     for (AdminBiz adminBiz : SdJobExecutor.getAdminBizList()) {
                         try {
                             ReturnT<String> registryResult = adminBiz.registry(registryParam);
@@ -67,6 +68,7 @@ public class ExecutorRegistryThread {
                 }
                 try {
                     if (!toStop){
+                        // 每隔30s重新注册一次
                         TimeUnit.SECONDS.sleep(RegistryConfig.BEAT_TIMEOUT);
                     }
                 }catch (InterruptedException e){

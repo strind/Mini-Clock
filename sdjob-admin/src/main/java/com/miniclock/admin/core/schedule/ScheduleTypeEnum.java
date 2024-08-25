@@ -1,8 +1,6 @@
 package com.miniclock.admin.core.schedule;
 
 
-import com.miniclock.admin.core.util.I18nUtil;
-
 /**
  * @author strind
  * @date 2024/8/24 16:42
@@ -11,13 +9,13 @@ import com.miniclock.admin.core.util.I18nUtil;
 public enum ScheduleTypeEnum {
 
     //不使用任何类型
-    NONE(I18nUtil.getString("schedule_type_none")),
+    NONE("schedule_type_none"),
 
     //一般都是用cron表达式
-    CRON(I18nUtil.getString("schedule_type_cron")),
+    CRON("schedule_type_cron"),
 
     //按照固定频率
-    FIX_RATE(I18nUtil.getString("schedule_type_fix_rate"));
+    FIX_RATE("schedule_type_fix_rate");
 
 
     private String title;

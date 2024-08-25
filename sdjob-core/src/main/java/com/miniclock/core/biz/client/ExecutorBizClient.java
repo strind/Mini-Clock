@@ -8,7 +8,7 @@ import com.miniclock.core.util.SdJobRemotingUtil;
 /**
  * @author strind
  * @date 2024/8/24 19:04
- * @description 由调度中心使用，调用客户端接口
+ * @description 由调度中心使用
  */
 public class ExecutorBizClient implements ExecutorBiz {
 

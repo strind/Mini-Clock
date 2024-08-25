@@ -1,16 +1,19 @@
 package com.miniclock.admin.core.route;
 
-import com.miniclock.admin.core.route.strategy.ExecutorRouteFirst;
-import com.miniclock.admin.core.util.I18nUtil;
+import com.miniclock.admin.core.route.strategy.*;
 
 /**
  * @author strind
  * @date 2024/8/24 11:14
- * @description
+ * @description 路由策略枚举
  */
 public enum ExecutorRouteStrategyEnum {
 
-    FIRST(I18nUtil.getString("jobconf_route_first"), new ExecutorRouteFirst());
+    FIRST("优先选择首个", new ExecutorRouteFirst()),
+    Last("选择最后一个", new ExecutorRouteLast()),
+    Random("随机选一个",new ExecutorRouteRandom()),
+    round("轮询",new ExecutorRouteRound()),
+    failover("故障转移",new ExecutorRouteFailover());
 
     ExecutorRouteStrategyEnum(String title, ExecutorRouter router) {
         this.title = title;
@@ -27,7 +30,7 @@ public enum ExecutorRouteStrategyEnum {
         return router;
     }
 
-    public static ExecutorRouteStrategyEnum match(String name, ExecutorRouteStrategyEnum defaultItem){
+    public static ExecutorRouteStrategyEnum getDefaultIfMatchFail(String name, ExecutorRouteStrategyEnum defaultItem){
         if (name != null) {
             for (ExecutorRouteStrategyEnum item: ExecutorRouteStrategyEnum.values()) {
                 if (item.name().equals(name)) {

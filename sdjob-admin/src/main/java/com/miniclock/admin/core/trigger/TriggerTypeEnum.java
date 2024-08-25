@@ -1,7 +1,5 @@
 package com.miniclock.admin.core.trigger;
 
-import com.miniclock.admin.core.util.I18nUtil;
-
 /**
  * @author strind
  * @date 2024/8/24 11:22
@@ -9,12 +7,12 @@ import com.miniclock.admin.core.util.I18nUtil;
  */
 public enum TriggerTypeEnum {
 
-    MANUAL(I18nUtil.getString("jobconf_trigger_type_manual")),
-    CRON(I18nUtil.getString("jobconf_trigger_type_cron")),
-    RETRY(I18nUtil.getString("jobconf_trigger_type_retry")),
-    PARENT(I18nUtil.getString("jobconf_trigger_type_parent")),
-    API(I18nUtil.getString("jobconf_trigger_type_api")),
-    MISFIRE(I18nUtil.getString("jobconf_trigger_type_misfire"));
+    MANUAL("jobconf_trigger_type_manual"),
+    CRON("jobconf_trigger_type_cron"),
+    RETRY("jobconf_trigger_type_retry"),
+    PARENT("jobconf_trigger_type_parent"),
+    API("jobconf_trigger_type_api"),
+    MISFIRE("jobconf_trigger_type_misfire");
 
     private TriggerTypeEnum(String title){
         this.title = title;

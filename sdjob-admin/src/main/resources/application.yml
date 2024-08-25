@@ -1,0 +1,26 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    username: root
+    password: 200339LHT
+    url: jdbc:mysql://localhost:3306/sd-job
+
+  mail:
+    host: smtp.example.com
+    port: 587
+    username: your-email@example.com
+    password: your-password
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+
+sd:
+  job:
+    accessToken: token
+    log:
+      retentionDays: 7
+    triggerPool:
+      slow:
+        max: 200
+      fast:
+        max: 150
