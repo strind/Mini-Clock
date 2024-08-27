@@ -8,7 +8,7 @@ package com.miniclock.core.enums;
 public class RegistryConfig {
 
     // 每30秒向注册中心重新注册一次
-    public static final int BEAT_TIMEOUT = 30;
+    public static final int BEAT_TIMEOUT = 30* 1000;
     public static final int DEAD_TIMEOUT = BEAT_TIMEOUT * 3;
 
     public enum RegistryType{

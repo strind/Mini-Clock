@@ -1,18 +1,19 @@
+
 spring:
   datasource:
-    driver-class-name: com.mysql.jdbc.Driver
+    driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
     password: 200339LHT
-    url: jdbc:mysql://localhost:3306/sd-job
+    url: jdbc:mysql://localhost:3306/sd-job?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&serverTimezone=Asia/Shanghai
 
-  mail:
-    host: smtp.example.com
-    port: 587
-    username: your-email@example.com
-    password: your-password
-    properties:
-      mail.smtp.auth: true
-      mail.smtp.starttls.enable: true
+#  mail:
+#    host: localhost
+#    port: 587
+#    username: your-email@example.com
+#    password: your-password
+#    properties:
+#      mail.smtp.auth: true
+#      mail.smtp.starttls.enable: true
 
 sd:
   job:
@@ -24,3 +25,7 @@ sd:
         max: 200
       fast:
         max: 150
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+server:
+  port: 7777

@@ -30,7 +30,7 @@ public class ExecutorBizClient implements ExecutorBiz {
     private int timeout = 3;
     @Override
     public ReturnT<String> run(TriggerParam triggerParam) {
-        return SdJobRemotingUtil.postBody(addressUrl + "run", accessToken, timeout, triggerParam, String.class);
+        return SdJobRemotingUtil.postBody(addressUrl + "run", accessToken, timeout, triggerParam, ReturnT.class);
     }
 
 }

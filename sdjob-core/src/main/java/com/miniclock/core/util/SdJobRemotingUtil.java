@@ -1,15 +1,21 @@
 package com.miniclock.core.util;
 
 import com.miniclock.core.biz.model.ReturnT;
+import org.apache.http.HttpEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.*;
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
@@ -64,79 +70,55 @@ public class SdJobRemotingUtil {
     /**
      * 发送post消息
      */
-    public static ReturnT postBody(String url, String accessToken, int timeout, Object requestObj, Class returnTargClassOfT) {
-        HttpURLConnection connection = null;
-        BufferedReader bufferedReader = null;
+    public static ReturnT<String> postBody(String url, String accessToken, int timeout, Object requestObj, Class<ReturnT> returnTargClassOfT) {
+        CloseableHttpClient httpClient = null;
+        CloseableHttpResponse response = null;
+
+        url = "http://" + url;
+        HttpPost httpPost = new HttpPost("https://" + url);
+
         try {
-            //创建链接
-            URL realUrl = new URL(url);
-            connection = (HttpURLConnection) realUrl.openConnection();
-            //判断是不是https开头的
-            boolean useHttps = url.startsWith("https");
-            if (useHttps) {
-                HttpsURLConnection https = (HttpsURLConnection) connection;
-                trustAllHosts(https);
+            if (url.startsWith("https")) {
+                SSLContext sslContext = SSLContext.getInstance("TLS");
+                sslContext.init(null, trustAllCerts,new java.security.SecureRandom());
+                httpClient = HttpClients.custom()
+                    .setSSLContext(sslContext).build();
+            }else httpClient = HttpClients.createDefault();
+
+            httpPost = new HttpPost(url);
+            httpPost.setHeader("Content-Type", "application/json;charset=UTF-8");
+            httpPost.setHeader("Accept-Charset", "application/json;charset=UTF-8");
+            httpPost.setHeader("Connection", "Keep-Alive");
+
+            if (accessToken != null && !accessToken.trim().isEmpty()) {
+                httpPost.setHeader(SD_JOB_ACCESS_TOKEN, accessToken);
             }
-            connection.setRequestMethod("POST");
-            connection.setDoOutput(true);
-            connection.setDoInput(true);
-            connection.setUseCaches(false);
-            connection.setReadTimeout(timeout * 1000);
-            connection.setConnectTimeout(3 * 1000);
-            connection.setRequestProperty("connection", "Keep-Alive");
-            connection.setRequestProperty("Content-Type", "application/json;charset=UTF-8");
-            connection.setRequestProperty("Accept-Charset", "application/json;charset=UTF-8");
-            //判断令牌是否为空
-            if(accessToken!=null && accessToken.trim().length()>0){
-                //设置令牌，以键值对的形式，键就是该类的静态成员变量
-                connection.setRequestProperty(SD_JOB_ACCESS_TOKEN, accessToken);
-            }
-            //进行连接
-            connection.connect();
-            if (requestObj != null) {
-                //序列化请求体，也就是要发送的触发器参数
+            if (requestObj != null){
                 String requestBody = GsonTool.toJson(requestObj);
-                //下面就开始正式发送消息了
-                DataOutputStream dataOutputStream = new DataOutputStream(connection.getOutputStream());
-                dataOutputStream.write(requestBody.getBytes("UTF-8"));
-                //刷新缓冲区
-                dataOutputStream.flush();
-                //释放资源
-                dataOutputStream.close();
+                HttpEntity entity = new StringEntity(requestBody, StandardCharsets.UTF_8);
+                httpPost.setEntity(entity);
             }
-            //获取响应码
-            int statusCode = connection.getResponseCode();
-            if (statusCode != 200) {
+
+            response = httpClient.execute(httpPost);
+            int statusCode = response.getStatusLine().getStatusCode();
+            if (statusCode != 200){
                 //设置失败结果
                 return new ReturnT<String>(ReturnT.FAIL_CODE, "xxl-job remoting fail, StatusCode("+ statusCode +") invalid. for url : " + url);
             }
-            bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
-            StringBuilder result = new StringBuilder();
-            String line;
-            //接收返回信息
-            while ((line = bufferedReader.readLine()) != null) {
-                result.append(line);
-            }
-            //转换为字符串
-            String resultJson = result.toString();
+//            HttpEntity responseEntity = response.getEntity();
+//            String resultJson = EntityUtils.toString(responseEntity, StandardCharsets.UTF_8);
+//            return GsonTool.fromJson(resultJson, returnTargClassOfT);
+            return ReturnT.SUCCESS;
+        } catch (NoSuchAlgorithmException | KeyManagementException | IOException e) {
+            throw new RuntimeException(e);
+        }
+        finally {
             try {
-                //转换为ReturnT对象，返回给用户
-                ReturnT returnT = GsonTool.fromJson(resultJson, ReturnT.class, returnTargClassOfT);
-                return returnT;
-            } catch (Exception e) {
-                logger.error("xxl-job remoting (url="+url+") response content invalid("+ resultJson +").", e);
-                return new ReturnT<String>(ReturnT.FAIL_CODE, "xxl-job remoting (url="+url+") response content invalid("+ resultJson +").");
-            }
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-            return new ReturnT<String>(ReturnT.FAIL_CODE, "xxl-job remoting error("+ e.getMessage() +"), for url : " + url);
-        } finally {
-            try {
-                if (bufferedReader != null) {
-                    bufferedReader.close();
+                if (response != null) {
+                    response.close();
                 }
-                if (connection != null) {
-                    connection.disconnect();
+                if (httpClient != null) {
+                    httpClient.close();
                 }
             } catch (Exception e2) {
                 logger.error(e2.getMessage(), e2);

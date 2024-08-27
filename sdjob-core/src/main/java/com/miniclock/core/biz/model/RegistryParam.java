@@ -49,4 +49,13 @@ public class RegistryParam implements Serializable {
     public void setGetRegistryValue(String getRegistryValue) {
         this.getRegistryValue = getRegistryValue;
     }
+
+    @Override
+    public String toString() {
+        return "RegistryParam{" +
+            "registryGroup='" + registryGroup + '\'' +
+            ", registryKey='" + registryKey + '\'' +
+            ", getRegistryValue='" + getRegistryValue + '\'' +
+            '}';
+    }
 }

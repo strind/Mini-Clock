@@ -1,7 +1,7 @@
 package com.miniclock.admin.core.thread;
 
 import com.miniclock.admin.core.conf.SdJobAdminConfig;
-import com.miniclock.admin.core.cron.CronExpression;
+import org.springframework.scheduling.support.CronExpression;
 import com.miniclock.admin.core.model.SdJobInfo;
 import com.miniclock.admin.core.schedule.MisfireStrategyEnum;
 import com.miniclock.admin.core.schedule.ScheduleTypeEnum;
@@ -14,6 +14,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.text.ParseException;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalField;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -83,7 +87,7 @@ public class JobScheduleHelper {
                     autoCommit = conn.getAutoCommit();
                     conn.setAutoCommit(false);
                     preparedStatement = conn.prepareStatement(
-                        "select * from xxl_job_lock where lock_name = 'schedule_lock' for update");
+                        "select * from sd_job_lock where lock_name = 'schedule_lock' for update");
                     //开始执行sql语句，得到数据库锁
                     preparedStatement.execute();
                     long now_time = System.currentTimeMillis();
@@ -126,7 +130,7 @@ public class JobScheduleHelper {
                                 refreshNextValidTime(job, new Date(job.getTriggerNextTime()));
                             }
                             // 更新信息
-                            SdJobAdminConfig.getAdminConfig().getJobInfoMapper().save(job);
+                            SdJobAdminConfig.getAdminConfig().getJobInfoMapper().update(job);
                         }
                     } else {
                         preReadSuc = false; // 标记这次没有定时任务
@@ -255,12 +259,37 @@ public class JobScheduleHelper {
     public static Date generateNextValidTime(SdJobInfo jobInfo, Date fromTime) throws ParseException {
         ScheduleTypeEnum match = ScheduleTypeEnum.match(jobInfo.getScheduleType(), null);
         if (ScheduleTypeEnum.CRON == match){
-            return new CronExpression(jobInfo.getScheduleConf()).getNextValidTimeAfter(fromTime);
+            CronExpression cronExpression = CronExpression.parse(jobInfo.getScheduleConf());
+            ZonedDateTime next = cronExpression.next(fromTime.toInstant().atZone((ZoneId.of("Asia/Shanghai"))));
+            return Date.from(next.toInstant());
         }else if (ScheduleTypeEnum.FIX_RATE == match){
             return new Date(fromTime.getTime() + Integer.valueOf(jobInfo.getScheduleConf()) * 1000);
         }
         return null;
     }
+
+//    public static void main(String[] args) {
+//        // 你的cron表达式
+//        String cronExpressionString = "0/5 * * * * ?"; // 每5分钟执行一次
+//
+//        // 创建一个CronExpression实例
+//        CronExpression cronExpression = null;
+//        try {
+//            cronExpression = CronExpression.parse(cronExpressionString);
+//            ZonedDateTime now = ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS);
+//            System.out.println(now);
+//
+//            // 计算下一个执行时间
+//            ZonedDateTime nextExecution = cronExpression.next(now);
+//
+//            assert nextExecution != null;
+//            System.out.println(nextExecution);
+//        } catch (Exception e) {
+//            throw new RuntimeException(e);
+//        }
+//
+//
+//    }
 
     public void toStop() {
         scheduleThreadToStop = true;

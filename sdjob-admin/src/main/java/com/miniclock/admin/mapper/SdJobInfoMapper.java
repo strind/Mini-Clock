@@ -1,7 +1,10 @@
 package com.miniclock.admin.mapper;
 
+
 import com.miniclock.admin.core.model.SdJobInfo;
+import org.apache.ibatis.annotations.Flush;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -13,18 +16,15 @@ import java.util.List;
 @Mapper
 public interface SdJobInfoMapper {
 
-    // 根据定时任务的名字，查询定时任务信息
-    SdJobInfo loadByName(String name);
+    @Flush
     SdJobInfo loadById(Integer id);
 
     // 保存任务信息
     Integer save(SdJobInfo jobInfo);
 
-    // 查询所有的定时任务
-    List<SdJobInfo> findAll();
-
     //
-    List<SdJobInfo> scheduleJobQuery(long maxNextTime, int preReadCount);
+    List<SdJobInfo> scheduleJobQuery(@Param("maxNextTime") long maxNextTime, @Param("preReadCount") int preReadCount);
 
+    void update(SdJobInfo job);
 }
 

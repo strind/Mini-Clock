@@ -136,7 +136,7 @@ public class SdJobExecutor {
 
     // 启动执行器内嵌的Netty服务器
     private void initEmbedServer(String address, String ip, int port, String appName, String accessToken) {
-        port = port > 0? port : NetUtil.findAvailablePort(9999);
+        port = port > 0? port : NetUtil.findAvailablePort(19999);
         ip = (ip != null && !ip.trim().isEmpty()) ? ip : IpUtil.getIp();
         if (address == null || address.trim().isEmpty()){
             String ip_port_address = IpUtil.getIpPort(ip, port);
@@ -180,5 +180,108 @@ public class SdJobExecutor {
                 logger.error(e.getMessage(), e);
             }
         }
+    }
+
+
+    public String getAdminAddress() {
+        return adminAddress;
+    }
+
+    public void setAdminAddress(String adminAddress) {
+        this.adminAddress = adminAddress;
+    }
+
+    public String getAppName() {
+        return appName;
+    }
+
+    public void setAppName(String appName) {
+        this.appName = appName;
+    }
+
+    public String getAccessToken() {
+        return accessToken;
+    }
+
+    public void setAccessToken(String accessToken) {
+        this.accessToken = accessToken;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getIp() {
+        return ip;
+    }
+
+    public void setIp(String ip) {
+        this.ip = ip;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public void setPort(int port) {
+        this.port = port;
+    }
+
+    public String getLogPath() {
+        return logPath;
+    }
+
+    public void setLogPath(String logPath) {
+        this.logPath = logPath;
+    }
+
+    public int getLogRetentionDays() {
+        return logRetentionDays;
+    }
+
+    public void setLogRetentionDays(int logRetentionDays) {
+        this.logRetentionDays = logRetentionDays;
+    }
+
+    public static ConcurrentMap<String, IJobHandler> getJobHandlerMap() {
+        return jobHandlerMap;
+    }
+
+    public static void setJobHandlerMap(
+        ConcurrentMap<String, IJobHandler> jobHandlerMap) {
+        SdJobExecutor.jobHandlerMap = jobHandlerMap;
+    }
+
+    public static ConcurrentMap<Integer, JobThread> getJobThreadRepository() {
+        return jobThreadRepository;
+    }
+
+    public static void setJobThreadRepository(
+        ConcurrentMap<Integer, JobThread> jobThreadRepository) {
+        SdJobExecutor.jobThreadRepository = jobThreadRepository;
+    }
+
+    public EmbedServer getEmbedServer() {
+        return embedServer;
+    }
+
+    public void setEmbedServer(EmbedServer embedServer) {
+        this.embedServer = embedServer;
+    }
+
+    public static Logger getLogger() {
+        return logger;
+    }
+
+    public static void setLogger(Logger logger) {
+        SdJobExecutor.logger = logger;
+    }
+
+    public static void setAdminBizList(List<AdminBiz> adminBizList) {
+        SdJobExecutor.adminBizList = adminBizList;
     }
 }

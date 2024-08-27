@@ -40,7 +40,7 @@ public class SdJobAdminConfig implements InitializingBean, DisposableBean {
     @Resource
     private SdJobInfoMapper jobInfoMapper;
 
-    @Resource
+    //@Resource
     private JavaMailSender mailSender;
 
     @Resource
@@ -75,7 +75,7 @@ public class SdJobAdminConfig implements InitializingBean, DisposableBean {
 
     @Value("${sd.job.accessToken}")
     private String accessToken;
-    @Value("${spring.mail.host}")
+    //@Value("${spring.mail.host}")
     private String emailFrom;
     @Value("${sd.job.triggerPool.fast.max}")
     private int triggerPoolFastMax;

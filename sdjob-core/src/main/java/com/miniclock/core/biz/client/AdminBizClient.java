@@ -30,11 +30,11 @@ public class AdminBizClient implements AdminBiz {
 
     @Override
     public ReturnT<String> registry(RegistryParam registryParam) {
-        return SdJobRemotingUtil.postBody(addressUrl + "/api/registry",accessToken,timeout,registryParam,String.class);
+        return SdJobRemotingUtil.postBody(addressUrl + "/api/registry",accessToken,timeout,registryParam,ReturnT.class);
     }
 
     @Override
     public ReturnT<String> registryRemove(RegistryParam registryParam) {
-        return SdJobRemotingUtil.postBody(addressUrl + "/api/registryRemove",accessToken,timeout,registryParam,String.class);
+        return SdJobRemotingUtil.postBody(addressUrl + "/api/registryRemove",accessToken,timeout,registryParam,ReturnT.class);
     }
 }

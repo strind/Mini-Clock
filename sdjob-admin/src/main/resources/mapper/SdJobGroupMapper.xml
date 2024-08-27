@@ -2,12 +2,44 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.miniclock.admin.mapper.SdJobGroupMapper">
-    <update id="update">
 
+    <resultMap id="jobGroupMap" type="com.miniclock.admin.core.model.SdJobGroup">
+        <result column="address_registry_type" property="addressRegistryType"/>
+        <result column="address_list" property="addressList"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+    <insert id="sava" parameterType="com.miniclock.admin.core.model.SdJobGroup" useGeneratedKeys="true" keyProperty="id">
+        insert into `sd-job-group`(appName, address_registry_type, address_list, update_time)
+        values (#{appName},#{addressRegistryType},#{addressList},#{updateTime})
+    </insert>
+    <update id="update">
+        update `sd-job-group`
+        <set>
+            <if test="appName != null">
+                appName = #{appName},
+            </if>
+            <if test="title != null">
+                title = #{title},
+            </if>
+            <if test="addressRegistryType != null">
+                address_registry_type = #{addressRegistryType},
+            </if>
+            <if test="addressList != null">
+                address_list = #{addressList},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime},
+            </if>
+        </set>
+        where id = #{id};
     </update>
 
-    <select id="findByAddressType" resultType="com.miniclock.admin.core.model.SdJobGroup">
-
+    <select id="findByAddressType" resultMap="jobGroupMap">
+        select *
+        from `sd-job-group` where address_registry_type = #{addressType};
     </select>
-    <select id="load" resultType="com.miniclock.admin.core.model.SdJobGroup"></select>
+    <select id="load" resultMap="jobGroupMap">
+        select *
+        from `sd-job-group` where id = #{id};
+    </select>
 </mapper>

@@ -2,17 +2,55 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.miniclock.admin.mapper.SdJobRegistryMapper">
-    <insert id="registrySave"></insert>
-    <update id="removeDead"></update>
+
+    <resultMap id="XxlJobRegistry" type="com.miniclock.admin.core.model.SdJobRegistry">
+        <result column="id" property="id"/>
+        <result column="registry_group" property="registryGroup"/>
+        <result column="registry_key" property="registryKey"/>
+        <result column="registry_value" property="registryValue"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <select id="findDead" parameterType="java.util.HashMap" resultType="java.lang.Integer">
+        SELECT t.id
+        FROM sd_job_registry AS t
+        WHERE t.update_time <![CDATA[ < ]]> DATE_ADD(#{date}, INTERVAL -#{timeout} SECOND)
+    </select>
+
+    <delete id="removeDead" parameterType="java.lang.Integer">
+        DELETE FROM sd_job_registry
+        WHERE id in
+        <foreach collection="ids" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </delete>
+
+    <select id="findAll" parameterType="java.util.HashMap" resultMap="XxlJobRegistry">
+        SELECT *
+        FROM sd_job_registry AS t
+        WHERE t.update_time <![CDATA[ > ]]> DATE_ADD(#{nowtime},INTERVAL -#{timeout} SECOND)
+    </select>
+
     <update id="registryUpdate">
-
+        UPDATE sd_job_registry
+        SET `update_time` = #{updateTime}
+        WHERE `registry_group` = #{registryGroup}
+          AND `registry_key` = #{registryKey}
+          AND `registry_value` = #{registryValue}
     </update>
-    <delete id="registryDelete"></delete>
 
-    <select id="findDead" resultType="java.lang.Integer">
+    <insert id="registrySave">
+        INSERT INTO sd_job_registry(`registry_group`, `registry_key`, `registry_value`, `update_time`)
+        VALUES (#{registryGroup}, #{registryKey}, #{registryValue}, #{updateTime})
+    </insert>
 
-    </select>
-    <select id="findAll" resultType="com.miniclock.admin.core.model.SdJobRegistry">
+    <delete id="registryDelete">
+        DELETE
+        FROM sd_job_registry
+        WHERE registry_group = #{registryGroup}
+          AND registry_key = #{registryKey}
+          AND registry_value = #{registryValue}
+    </delete>
 
-    </select>
+
 </mapper>

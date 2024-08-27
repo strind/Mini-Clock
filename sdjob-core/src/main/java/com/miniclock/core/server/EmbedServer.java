@@ -82,6 +82,7 @@ public class EmbedServer {
                     .childOption(ChannelOption.SO_KEEPALIVE,true);
                 ChannelFuture future = bootstrap.bind(port).sync();
                 // 注册执行器到调度中心
+                logger.info("register to {} by appName {}", address, appName);
                 startRegistry(appName, address);
                 // 等待关闭
                 future.channel().closeFuture().sync();
@@ -99,6 +100,7 @@ public class EmbedServer {
         });
         work.setDaemon(true);
         work.start();
+        logger.info("SdJob EmbedServer started....");
     }
 
     public void stop() {
@@ -123,6 +125,8 @@ public class EmbedServer {
             this.bizThreadPool = bizThreadPool;
         }
 
+
+
         @Override
         protected void channelRead0(final ChannelHandlerContext ctx, FullHttpRequest msg)
             throws Exception {
@@ -135,7 +139,7 @@ public class EmbedServer {
             String accessToken = msg.headers().get(SdJobRemotingUtil.SD_JOB_ACCESS_TOKEN);
 
             bizThreadPool.execute(()->{
-                Object responseObj = process(httpMethod, uri, requestData,accessToken);
+                Object responseObj = process(httpMethod, requestData, uri,accessToken);
                 String response = GsonTool.toJson(responseObj);
                 writeResponse(ctx,keepAlive, response);
             });

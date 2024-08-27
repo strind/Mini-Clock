@@ -46,6 +46,7 @@ public class ExecutorRegistryThread {
                     //这里考虑到调度中心也许是以集群的形式存在，所以从集合中得到每一个和调度中心通话地客户端，然后发送注册消息即可
                     for (AdminBiz adminBiz : SdJobExecutor.getAdminBizList()) {
                         try {
+                            logger.info("registry executor again ..");
                             ReturnT<String> registryResult = adminBiz.registry(registryParam);
                             if (registryResult != null && ReturnT.SUCCESS_CODE == registryResult.getCode()) {
                                 registryResult = ReturnT.SUCCESS;
@@ -58,7 +59,7 @@ public class ExecutorRegistryThread {
                                     registryParam, registryResult);
                             }
                         } catch (Exception e) {
-                            logger.debug(">>>>>>>> SdJob registry error, registryParam: {}", registryParam);
+                            logger.error(">>>>>>>> SdJob registry error, registryParam: {}", registryParam);
                         }
                     }
                 }catch (Exception e){

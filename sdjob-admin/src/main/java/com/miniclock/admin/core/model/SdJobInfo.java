@@ -14,16 +14,11 @@ public class SdJobInfo {
     private int id;
     //该定时任务所属的执行器的id
     private int jobGroup;
-    //定时任务描述
-    private String jobDesc;
+
     //定时任务添加的时间
     private Date addTime;
     //定时任务的更新时间
     private Date updateTime;
-    //负责人
-    private String author;
-    //报警邮件
-    private String alarmEmail;
     //调度类型
     private String scheduleType;
     //一般为调度的cron表达式
@@ -50,8 +45,7 @@ public class SdJobInfo {
     private String glueRemark;
     //glue更新时间
     private Date glueUpdatetime;
-    //子任务id
-    private String childJobId;
+
     //定时任务触发状态，0为停止，1为运行
     private int triggerStatus;
     //最近一次的触发时间
@@ -75,13 +69,6 @@ public class SdJobInfo {
         this.jobGroup = jobGroup;
     }
 
-    public String getJobDesc() {
-        return jobDesc;
-    }
-
-    public void setJobDesc(String jobDesc) {
-        this.jobDesc = jobDesc;
-    }
 
     public Date getAddTime() {
         return addTime;
@@ -97,22 +84,6 @@ public class SdJobInfo {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
-    }
-
-    public String getAuthor() {
-        return author;
-    }
-
-    public void setAuthor(String author) {
-        this.author = author;
-    }
-
-    public String getAlarmEmail() {
-        return alarmEmail;
-    }
-
-    public void setAlarmEmail(String alarmEmail) {
-        this.alarmEmail = alarmEmail;
     }
 
     public String getScheduleType() {
@@ -217,14 +188,6 @@ public class SdJobInfo {
 
     public void setGlueUpdatetime(Date glueUpdatetime) {
         this.glueUpdatetime = glueUpdatetime;
-    }
-
-    public String getChildJobId() {
-        return childJobId;
-    }
-
-    public void setChildJobId(String childJobId) {
-        this.childJobId = childJobId;
     }
 
     public int getTriggerStatus() {
