@@ -3,6 +3,7 @@ package com.miniclock.admin.core.conf;
 import com.miniclock.admin.core.schedule.SdJobScheduler;
 import com.miniclock.admin.mapper.SdJobGroupMapper;
 import com.miniclock.admin.mapper.SdJobInfoMapper;
+import com.miniclock.admin.mapper.SdJobLogMapper;
 import com.miniclock.admin.mapper.SdJobRegistryMapper;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
@@ -39,6 +40,9 @@ public class SdJobAdminConfig implements InitializingBean, DisposableBean {
 
     @Resource
     private SdJobInfoMapper jobInfoMapper;
+
+    @Resource
+    private SdJobLogMapper sdJobLogMapper;
 
     //@Resource
     private JavaMailSender mailSender;
@@ -138,6 +142,14 @@ public class SdJobAdminConfig implements InitializingBean, DisposableBean {
 
     public void setEmailFrom(String emailFrom) {
         this.emailFrom = emailFrom;
+    }
+
+    public SdJobLogMapper getSdJobLogMapper() {
+        return sdJobLogMapper;
+    }
+
+    public void setSdJobLogMapper(SdJobLogMapper sdJobLogMapper) {
+        this.sdJobLogMapper = sdJobLogMapper;
     }
 
     public int getTriggerPoolFastMax() {

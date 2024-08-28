@@ -16,7 +16,6 @@ import java.util.List;
 @Mapper
 public interface SdJobInfoMapper {
 
-    @Flush
     SdJobInfo loadById(Integer id);
 
     // 保存任务信息

@@ -20,6 +20,16 @@ public class TriggerParam implements Serializable {
     //定时任务运行类型
     private String glueType;
 
+    private long logId;
+
+    public long getLogId() {
+        return logId;
+    }
+
+    public void setLogId(long logId) {
+        this.logId = logId;
+    }
+
     public String getGlueType() {
         return glueType;
     }

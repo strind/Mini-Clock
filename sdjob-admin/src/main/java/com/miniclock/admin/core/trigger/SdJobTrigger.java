@@ -3,6 +3,7 @@ package com.miniclock.admin.core.trigger;
 import com.miniclock.admin.core.conf.SdJobAdminConfig;
 import com.miniclock.admin.core.model.SdJobGroup;
 import com.miniclock.admin.core.model.SdJobInfo;
+import com.miniclock.admin.core.model.SdJobLog;
 import com.miniclock.admin.core.route.ExecutorRouteStrategyEnum;
 import com.miniclock.admin.core.schedule.SdJobScheduler;
 import com.miniclock.core.biz.ExecutorBiz;
@@ -12,6 +13,7 @@ import io.netty.util.internal.ThrowableUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -42,25 +44,33 @@ public class SdJobTrigger {
     }
 
     private static void processTrigger(SdJobGroup group, SdJobInfo jobInfo, int finalFailRetryCount, TriggerTypeEnum triggerType, int index, int total){
-        ExecutorRouteStrategyEnum executorRouteStrategyEnum = ExecutorRouteStrategyEnum.getDefaultIfMatchFail(jobInfo.getExecutorRouteStrategy(), null);
+        // 执行日志
+        SdJobLog jobLog = new SdJobLog();
+        jobLog.setJobGroup(jobInfo.getJobGroup());
+        jobLog.setJobId(jobInfo.getId());
+        jobLog.setTriggerTime(new Date());
+        SdJobAdminConfig.getAdminConfig().getSdJobLogMapper().save(jobLog);
+
         // 触发器，在执行器那一端使用
         TriggerParam param = new TriggerParam();
         param.setJobId(jobInfo.getId());
         param.setExecutorHandler(jobInfo.getExecutorHandler());
         param.setExecutorParams(jobInfo.getExecutorParam());
         param.setExecutorBlockStrategy(jobInfo.getExecutorBlockStrategy());
+        param.setLogId(jobLog.getId());
         // 执行模式，一般都是Bean
         param.setGlueType(jobInfo.getGlueType());
         // 路由策略，选择一台机器
         String address = null;
         ReturnT<String> remoteAddressResult = null;
+        ExecutorRouteStrategyEnum executorRouteStrategyEnum = ExecutorRouteStrategyEnum.getDefaultIfMatchFail(jobInfo.getExecutorRouteStrategy(), null);
         List<String> registryList = group.getRegistryAddressList();
         if (registryList != null && !registryList.isEmpty()){
             remoteAddressResult = executorRouteStrategyEnum.getRouter().route(param, registryList);
             if (remoteAddressResult.getCode() == ReturnT.SUCCESS_CODE){
                 address = remoteAddressResult.getContent();
             }else {
-                remoteAddressResult = new ReturnT<>(ReturnT.FAIL_CODE,"");
+                remoteAddressResult = new ReturnT<>(ReturnT.FAIL_CODE,"jobConf Trigger Addrss is Empty");
             }
         }
         ReturnT<String> triggerResult = null;
@@ -70,6 +80,12 @@ public class SdJobTrigger {
         }else {
             triggerResult = new ReturnT<>(ReturnT.FAIL_CODE,null);
         }
+
+        jobLog.setExecutorAddress(address);
+        jobLog.setExecutorHandler(jobInfo.getExecutorHandler());
+        jobLog.setExecutorParam(jobInfo.getExecutorParam());
+        jobLog.setTriggerCode(triggerResult.getCode());
+        SdJobAdminConfig.getAdminConfig().getSdJobLogMapper().updateTriggerInfo(jobLog);
     }
 
     private static ReturnT runExecutor(TriggerParam triggerParam, String address){
