@@ -1,6 +1,7 @@
 package com.miniclock.core.biz.model;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * @author strind
@@ -21,6 +22,8 @@ public class TriggerParam implements Serializable {
     private String glueType;
 
     private long logId;
+
+    private long logDateTime;
 
     public long getLogId() {
         return logId;
@@ -68,5 +71,13 @@ public class TriggerParam implements Serializable {
 
     public void setExecutorParams(String executorParams) {
         this.executorParams = executorParams;
+    }
+
+    public long getLogDateTime() {
+        return logDateTime;
+    }
+
+    public void setLogDateTime(long logDateTime) {
+        this.logDateTime = logDateTime;
     }
 }

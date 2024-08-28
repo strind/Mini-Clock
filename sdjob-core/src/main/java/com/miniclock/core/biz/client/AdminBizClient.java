@@ -1,9 +1,12 @@
 package com.miniclock.core.biz.client;
 
 import com.miniclock.core.biz.AdminBiz;
+import com.miniclock.core.biz.model.HandleCallbackParam;
 import com.miniclock.core.biz.model.RegistryParam;
 import com.miniclock.core.biz.model.ReturnT;
 import com.miniclock.core.util.SdJobRemotingUtil;
+
+import java.util.List;
 
 /**
  * @author strind
@@ -26,6 +29,11 @@ public class AdminBizClient implements AdminBiz {
         if (this.addressUrl.endsWith("/")){
             this.addressUrl = this.addressUrl + "/";
         }
+    }
+
+    @Override
+    public ReturnT<String> callback(List<HandleCallbackParam> callbackParamList) {
+        return SdJobRemotingUtil.postBody(addressUrl+"api/callback", accessToken, timeout, callbackParamList, ReturnT.class);
     }
 
     @Override

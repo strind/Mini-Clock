@@ -1,13 +1,20 @@
 package com.miniclock.core.thread;
 
+import com.miniclock.core.biz.model.HandleCallbackParam;
+import com.miniclock.core.context.SdJobContext;
+import com.miniclock.core.context.SdJobHelper;
 import com.miniclock.core.executor.SdJobExecutor;
 import com.miniclock.core.handler.IJobHandler;
 import com.miniclock.core.handler.impl.JobHandler;
 import com.miniclock.core.biz.model.ReturnT;
 import com.miniclock.core.biz.model.TriggerParam;
+import com.miniclock.core.lob.SdJobFileAppender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.Date;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
@@ -16,7 +23,7 @@ import java.util.concurrent.TimeUnit;
  * @date 2024/8/24 8:33
  * @description 定时任务 与 执行线程 一一对应
  */
-public class JobThread extends Thread{
+public class JobThread extends Thread {
 
     public static Logger logger = LoggerFactory.getLogger(JobHandler.class);
     // 定时任务的id
@@ -35,14 +42,15 @@ public class JobThread extends Thread{
     private String stopReason;
 
     private boolean running = false;
-    public JobThread(int jobId, IJobHandler jobHandler){
+
+    public JobThread(int jobId, IJobHandler jobHandler) {
         this.jobHandler = jobHandler;
         this.jobId = jobId;
         this.triggerQueue = new LinkedBlockingQueue<>();
         this.setName("sdJOb, JobThread-" + jobId + "-" + System.currentTimeMillis());
     }
 
-    public ReturnT<String> pushTriggerParam(TriggerParam param){
+    public ReturnT<String> pushTriggerParam(TriggerParam param) {
         triggerQueue.add(param);
         return ReturnT.SUCCESS;
     }
@@ -54,28 +62,86 @@ public class JobThread extends Thread{
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
-        while (!toStop){
+        while (!toStop) {
             running = false;
-            idleTimes ++;
+            idleTimes++;
             TriggerParam triggerParam = null;
             try {
                 triggerParam = triggerQueue.poll(3L, TimeUnit.SECONDS);
-                if (triggerParam != null){
+                if (triggerParam != null) {
                     running = true;
                     idleTimes = 0;
+                    String logFileName = SdJobFileAppender.makeLogFileName(new Date(triggerParam.getLogDateTime()),
+                        triggerParam.getLogId());
+                    SdJobContext sdJobContext = new SdJobContext(triggerParam.getJobId(),
+                        triggerParam.getExecutorParams(),
+                        logFileName);
+                    SdJobContext.setXxlJobContext(sdJobContext);
                     jobHandler.execute();
-                }else {
+                    if (SdJobContext.getInstance().getHandleCode() <= 0) {
+                        SdJobHelper.handleFail("job handle result lost.");
+                    } else {
+                        //走到这里意味着定时任务执行成功了，从定时任务上下文中取出执行的结果信息
+                        String tempHandleMsg = SdJobContext.getInstance().getHandleMsg();
+                        //这里有一个三元运算，会判断执行结果信息是不是null，如果执行成功，毫无异常，这个结果信息就会是null
+                        //只有在执行失败的时候，才会有失败信息被XxlJobHelper记录进去
+                        tempHandleMsg = (tempHandleMsg != null && tempHandleMsg.length() > 50000)
+                            ? tempHandleMsg.substring(0, 50000).concat("...")
+                            : tempHandleMsg;
+                        //这里是执行成功了，所以得到的是null，赋值其实就是什么也没赋成
+                        SdJobContext.getInstance().setHandleMsg(tempHandleMsg);
+                    }
+                    //把结果存储到对应的日志文件中
+                    SdJobHelper.log(
+                        "<br>----------- xxl-job job execute end(finish) -----------<br>----------- Result: handleCode="
+                            + SdJobContext.getInstance().getHandleCode()
+                            + ", handleMsg = "
+                            + SdJobContext.getInstance().getHandleMsg()
+                    );
+                } else {
                     // 没有拉取到任务, 且空闲次数超过30次
-                    if (idleTimes > 30){
+                    if (idleTimes > 30) {
                         if (triggerQueue.isEmpty()) {
                             // 停止线程
-                            SdJobExecutor.removeJobThread(jobId,"executor idel times over limit.");
+                            SdJobExecutor.removeJobThread(jobId, "executor idel times over limit.");
                         }
                     }
                 }
             } catch (Throwable e) {
                 if (toStop) {
-                    logger.info("<br>----------- JobThread toStop, stopReason:{}", stopReason);
+                    //如果线程停止了，就记录线程停止的日志到定时任务对应的日志文件中
+                    SdJobHelper.log("<br>----------- JobThread toStop, stopReason:" + stopReason);
+                    //下面就是将异常信息记录到日志文件中的操作，因为这些都是在catch中执行的
+                    //就意味着肯定有异常了，所以要记录异常信息
+                    StringWriter stringWriter = new StringWriter();
+                    e.printStackTrace(new PrintWriter(stringWriter));
+                    String errorMsg = stringWriter.toString();
+                    SdJobHelper.handleFail(errorMsg);
+                    //在这里记录异常信息到日志文件中
+                    SdJobHelper.log("<br>----------- JobThread Exception:" + errorMsg + "<br>----------- sd-job job execute end(error) -----------");
+                }
+            }finally {
+                // 结果回调给调度中心
+                if(triggerParam != null) {
+                    if (!toStop) {
+                        //这里要再次判断线程是否停止运行
+                        //如果没有停止，就创建封装回调信息的HandleCallbackParam对象
+                        //把这个对象提交给TriggerCallbackThread内部的callBackQueue队列中
+                        TriggerCallbackThread.pushCallBack(new HandleCallbackParam(
+                            triggerParam.getLogId(),
+                            triggerParam.getLogDateTime(),
+                            SdJobContext.getInstance().getHandleCode(),
+                            SdJobContext.getInstance().getHandleMsg())
+                        );
+                    } else {
+                        //如果走到这里说明线程被终止了，就要封装处理失败的回信
+                        TriggerCallbackThread.pushCallBack(new HandleCallbackParam(
+                            triggerParam.getLogId(),
+                            triggerParam.getLogDateTime(),
+                            SdJobContext.HANDLE_CODE_FAIL,
+                            stopReason + " [job running, killed]" )
+                        );
+                    }
                 }
             }
         }
@@ -100,7 +166,8 @@ public class JobThread extends Thread{
         this.toStop = true;
         this.stopReason = removeOldReason;
     }
-    public boolean isRunningOrHasQueue(){
+
+    public boolean isRunningOrHasQueue() {
         return running || !triggerQueue.isEmpty();
     }
 }

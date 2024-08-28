@@ -57,6 +57,7 @@ public class SdJobTrigger {
         param.setExecutorHandler(jobInfo.getExecutorHandler());
         param.setExecutorParams(jobInfo.getExecutorParam());
         param.setExecutorBlockStrategy(jobInfo.getExecutorBlockStrategy());
+        param.setLogDateTime(jobLog.getTriggerTime().getTime());
         param.setLogId(jobLog.getId());
         // 执行模式，一般都是Bean
         param.setGlueType(jobInfo.getGlueType());
