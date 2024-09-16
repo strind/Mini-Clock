@@ -17,7 +17,8 @@ public enum ExecutorRouteStrategyEnum {
     LEAST_FREQUENTLY_USED("最不经常使用", new ExecutorRouteLFU()),
     LEAST_RECENTLY_USED("最近最久未使用", new ExecutorRouteLRU()),
     BUSYOVER("忙碌转移", new ExecutorRouteBusyover()),
-    failover("故障转移",new ExecutorRouteFailover());
+    SHARDING_BROADCAST("分片路由", null),
+    FAILOVER("故障转移",new ExecutorRouteFailover());
 
     ExecutorRouteStrategyEnum(String title, ExecutorRouter router) {
         this.title = title;
@@ -34,7 +35,7 @@ public enum ExecutorRouteStrategyEnum {
         return router;
     }
 
-    public static ExecutorRouteStrategyEnum getDefaultIfMatchFail(String name, ExecutorRouteStrategyEnum defaultItem){
+    public static ExecutorRouteStrategyEnum match(String name, ExecutorRouteStrategyEnum defaultItem){
         if (name != null) {
             for (ExecutorRouteStrategyEnum item: ExecutorRouteStrategyEnum.values()) {
                 if (item.name().equals(name)) {

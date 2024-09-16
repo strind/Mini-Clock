@@ -145,38 +145,10 @@ public class JobRegistryHelper {
         }
         registryOrRemoveThreadPool.execute(()->{
             // 先进行更新操作
-            logger.info("收到一个注册任务");
             int ret = SdJobAdminConfig.getAdminConfig().getJobRegistryMapper().registryUpdate(registryParam.getRegistryGroup(), registryParam.getRegistryKey(),registryParam.getGetRegistryValue(), new Date());
             if (ret < 1){
                 // 更新失败，说明数据不存在，插入新数据
                 SdJobAdminConfig.getAdminConfig().getJobRegistryMapper().registrySave(registryParam.getRegistryGroup(), registryParam.getRegistryKey(),registryParam.getGetRegistryValue(), new Date());
-                SdJobInfo sdJobInfo = new SdJobInfo();
-                sdJobInfo.setJobGroup(1);
-                sdJobInfo.setScheduleType(ScheduleTypeEnum.CRON.name());
-                sdJobInfo.setScheduleConf("*/5 * * * * ?");
-                sdJobInfo.setMisfireStrategy(MisfireStrategyEnum.DO_NOTHING.name());
-                sdJobInfo.setExecutorTimeout(5);
-                sdJobInfo.setExecutorHandler(registryParam.getRegistryKey());
-                sdJobInfo.setExecutorFailRetryCount(5);
-                sdJobInfo.setGlueType(GlueTypeEnum.BEAN.name());
-                sdJobInfo.setExecutorRouteStrategy(ExecutorRouteStrategyEnum.FIRST.name());
-                sdJobInfo.setTriggerStatus(1);
-                sdJobInfo.setTriggerLastTime(System.currentTimeMillis());
-                sdJobInfo.setTriggerNextTime(System.currentTimeMillis());
-
-                SdJobGroup group = new SdJobGroup();
-                group.setAppName(registryParam.getRegistryKey());
-                group.setAddressRegistryType(0);
-                group.setAddressList(registryParam.getGetRegistryValue());
-                group.setUpdateTime(new Date());
-                SdJobAdminConfig.getAdminConfig().getJobGroupMapper().sava(group);
-                sdJobInfo.setJobGroup(group.getId());
-                try {
-                    Integer save = SdJobAdminConfig.getAdminConfig().getJobInfoMapper().save(sdJobInfo);
-                    logger.info("任务表结果：{}",save);
-                }catch (Exception e){
-                    logger.error("信息表注册失败" , e);
-                }
                 freshGroupRegistryInfo(registryParam);
             }
         });
@@ -192,7 +164,7 @@ public class JobRegistryHelper {
         if (!StringUtils.hasText(registryParam.getRegistryGroup())
             || !StringUtils.hasText(registryParam.getRegistryKey())
             || !StringUtils.hasText(registryParam.getGetRegistryValue())){
-            return new ReturnT<String>(ReturnT.FAIL_CODE, "Illegal Argument");
+            return new ReturnT<>(ReturnT.FAIL_CODE, "Illegal Argument");
         }
         registryOrRemoveThreadPool.execute(()->{
             // 直接删除

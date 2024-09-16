@@ -41,6 +41,9 @@ public class SdJobScheduler {
 
     public void destroy(){
         JobScheduleHelper.getInstance().toStop();
+        JobLogReportHelper.getInstance().toStop();
+        JobCompleteHelper.getInstance().toStop();
+        JobFailMonitorHelper.getInstance().toStop();
         JobRegistryHelper.getInstance().toStop();
         JobTriggerPoolHelper.toStop();
     }

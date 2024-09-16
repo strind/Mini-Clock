@@ -24,6 +24,17 @@ public class TriggerParam implements Serializable {
     private long logId;
 
     private long logDateTime;
+    //超时时间
+    private int executorTimeout;
+
+    //代码文本
+    private String glueSource;
+    //glue更新时间
+    private long glueUpdatetime;
+    //分片索引
+    private int broadcastIndex;
+    //分片总数
+    private int broadcastTotal;
 
     public long getLogId() {
         return logId;
@@ -79,5 +90,45 @@ public class TriggerParam implements Serializable {
 
     public void setLogDateTime(long logDateTime) {
         this.logDateTime = logDateTime;
+    }
+
+    public void setExecutorTimeout(int executorTimeout) {
+        this.executorTimeout = executorTimeout;
+    }
+
+    public int getExecutorTimeout() {
+        return executorTimeout;
+    }
+
+    public String getGlueSource() {
+        return glueSource;
+    }
+
+    public void setGlueSource(String glueSource) {
+        this.glueSource = glueSource;
+    }
+
+    public long getGlueUpdatetime() {
+        return glueUpdatetime;
+    }
+
+    public void setGlueUpdatetime(long glueUpdatetime) {
+        this.glueUpdatetime = glueUpdatetime;
+    }
+
+    public int getBroadcastIndex() {
+        return broadcastIndex;
+    }
+
+    public void setBroadcastIndex(int broadcastIndex) {
+        this.broadcastIndex = broadcastIndex;
+    }
+
+    public int getBroadcastTotal() {
+        return broadcastTotal;
+    }
+
+    public void setBroadcastTotal(int broadcastTotal) {
+        this.broadcastTotal = broadcastTotal;
     }
 }

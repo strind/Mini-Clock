@@ -7,12 +7,12 @@ package com.miniclock.admin.core.trigger;
  */
 public enum TriggerTypeEnum {
 
-    MANUAL("jobconf_trigger_type_manual"),
-    CRON("jobconf_trigger_type_cron"),
-    RETRY("jobconf_trigger_type_retry"),
-    PARENT("jobconf_trigger_type_parent"),
-    API("jobconf_trigger_type_api"),
-    MISFIRE("jobconf_trigger_type_misfire");
+    MANUAL("manual"),
+    CRON("cron"),
+    RETRY("retry"),
+    PARENT("parent"),
+    API("api"),
+    MISFIRE("misfire");
 
     private TriggerTypeEnum(String title){
         this.title = title;

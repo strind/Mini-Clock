@@ -1,9 +1,6 @@
 package com.miniclock.admin.core.model;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author strind
@@ -82,4 +79,5 @@ public class SdJobGroup {
     public void setRegistryAddressList(List<String> registryAddressList) {
         this.registryAddressList = registryAddressList;
     }
+
 }
