@@ -15,6 +15,17 @@ public class SdJobInfo {
     //该定时任务所属的执行器的id
     private int jobGroup;
 
+    public String getJobDesc() {
+        return jobDesc;
+    }
+
+    public void setJobDesc(String jobDesc) {
+        this.jobDesc = jobDesc;
+    }
+
+    // 定时任务描述
+    private String jobDesc;
+
     //定时任务添加的时间
     private Date addTime;
     //定时任务的更新时间
@@ -52,6 +63,9 @@ public class SdJobInfo {
     private long triggerLastTime;
     //下一次的触发时间
     private long triggerNextTime;
+
+    // 报警邮件
+    private String alarmEmail;
 
     public int getId() {
         return id;
@@ -212,5 +226,13 @@ public class SdJobInfo {
 
     public void setTriggerNextTime(long triggerNextTime) {
         this.triggerNextTime = triggerNextTime;
+    }
+
+    public String getAlarmEmail() {
+        return alarmEmail;
+    }
+
+    public void setAlarmEmail(String alarmEmail) {
+        this.alarmEmail = alarmEmail;
     }
 }

@@ -27,10 +27,23 @@ public class SdJobLog {
     //触发器任务的响应码
     private int triggerCode;
 
+    public String getTriggerMsg() {
+        return triggerMsg;
+    }
+
+    public void setTriggerMsg(String triggerMsg) {
+        this.triggerMsg = triggerMsg;
+    }
+
+    // 触发任务信息
+    private String triggerMsg;
+
     //定时任务执行时间
     private Date handleTime;
     //执行的响应码
     private int handleCode;
+
+    private String handleMsg;
 
     //警报的状态码 0是默认，1是不需要报警，2是报警成功，3是报警失败
     private int alarmStatus;
@@ -121,5 +134,13 @@ public class SdJobLog {
 
     public void setAlarmStatus(int alarmStatus) {
         this.alarmStatus = alarmStatus;
+    }
+
+    public String getHandleMsg() {
+        return handleMsg;
+    }
+
+    public void setHandleMsg(String handleMsg) {
+        this.handleMsg = handleMsg;
     }
 }

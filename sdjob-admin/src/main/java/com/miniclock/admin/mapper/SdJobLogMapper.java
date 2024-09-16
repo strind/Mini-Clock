@@ -49,5 +49,6 @@ public interface SdJobLogMapper {
 
     public List<Long> findLostJobIds(@Param("losedTime") Date losedTime);
 
+    SdJobLog load(long logId);
 }
 

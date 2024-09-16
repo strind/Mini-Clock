@@ -6,6 +6,7 @@ import com.miniclock.admin.core.schedule.MisfireStrategyEnum;
 import com.miniclock.admin.core.schedule.ScheduleTypeEnum;
 import com.miniclock.admin.mapper.SdJobInfoMapper;
 import com.miniclock.core.biz.AdminBiz;
+import com.miniclock.core.biz.model.HandleCallbackParam;
 import com.miniclock.core.biz.model.RegistryParam;
 import com.miniclock.core.biz.model.ReturnT;
 import com.miniclock.core.glue.GlueTypeEnum;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author strind
@@ -49,6 +51,23 @@ public class ExecutorRegistryController {
 
         //执行注册任务
         return adminBiz.registry(registryParam);
+    }
+
+    @PostMapping("/callback")
+    public ReturnT<String> callback(HttpServletRequest request, @RequestBody(required = false) String data){
+        //判断是不是post请求
+        if (!"POST".equalsIgnoreCase(request.getMethod())) {
+            return new ReturnT<String>(ReturnT.FAIL_CODE, "invalid request, HttpMethod not support.");
+        }
+        //判断执行器配置的token和调度中心的是否相等
+        if (SdJobAdminConfig.getAdminConfig().getAccessToken()!=null
+            && !SdJobAdminConfig.getAdminConfig().getAccessToken().trim().isEmpty()
+            && !SdJobAdminConfig.getAdminConfig().getAccessToken().equals(request.getHeader(SdJobRemotingUtil.SD_JOB_ACCESS_TOKEN))) {
+            return new ReturnT<String>(ReturnT.FAIL_CODE, "The access token is wrong.");
+        }
+        List<HandleCallbackParam> callbackParamList = GsonTool.fromJson(data, List.class, HandleCallbackParam.class);
+        //执行注册任务
+        return adminBiz.callback(callbackParamList);
     }
 
 }

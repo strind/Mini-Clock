@@ -1,5 +1,6 @@
 package com.miniclock.admin.service.impl;
 
+import com.miniclock.admin.core.thread.JobCompleteHelper;
 import com.miniclock.admin.core.thread.JobRegistryHelper;
 import com.miniclock.core.biz.AdminBiz;
 import com.miniclock.core.biz.model.HandleCallbackParam;
@@ -19,7 +20,7 @@ public class AdminBizImpl implements AdminBiz {
 
     @Override
     public ReturnT<String> callback(List<HandleCallbackParam> callbackParamList) {
-        return null;
+        return JobCompleteHelper.getInstance().callback(callbackParamList);
     }
 
     @Override
