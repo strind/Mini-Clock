@@ -23,7 +23,7 @@ public class SdJobSpringExecutor extends SdJobExecutor implements ApplicationCon
 
     public static final Logger logger = LoggerFactory.getLogger(SdJobSpringExecutor.class);
 
-    private ApplicationContext applicationContext = null;
+    private static ApplicationContext applicationContext = null;
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
@@ -73,5 +73,8 @@ public class SdJobSpringExecutor extends SdJobExecutor implements ApplicationCon
         }
     }
 
+    public static ApplicationContext getApplicationContext() {
+        return applicationContext;
+    }
 }
 

@@ -20,14 +20,20 @@ public class SdJobContext {
 
     private int handleCode;
 
+    private final int shardIndex;
+
+
+    private final int shardTotal;
 
     private String handleMsg;
 
 
-    public SdJobContext(long jobId, String jobParam, String jobLogFileName ) {
+    public SdJobContext(long jobId, String jobParam, String jobLogFileName, int shardIndex, int shardTotal) {
         this.jobId = jobId;
         this.jobParam = jobParam;
         this.jobLogFileName = jobLogFileName;
+        this.shardIndex = shardIndex;
+        this.shardTotal = shardTotal;
         //构造方法中唯一值得注意的就是这里，创建XxlJobContext对象的时候默认定时任务的执行结果就是成功
         //如果执行失败了，自由其他方法把这里设置成失败
         this.handleCode = HANDLE_CODE_SUCCESS;
@@ -59,6 +65,14 @@ public class SdJobContext {
 
     public String getHandleMsg() {
         return handleMsg;
+    }
+
+    public int getShardIndex() {
+        return shardIndex;
+    }
+
+    public int getShardTotal() {
+        return shardTotal;
     }
 
     //这里是一个线程的本地变量，因为定时任务真正执行的时候，在执行器端是一个定时任务任务对应一个线程

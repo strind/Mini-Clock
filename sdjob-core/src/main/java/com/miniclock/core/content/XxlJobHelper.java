@@ -1,7 +1,7 @@
 package com.miniclock.core.content;
 
 
-import com.miniclock.core.lob.SdJobFileAppender;
+import com.miniclock.core.log.SdJobFileAppender;
 import com.miniclock.core.util.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

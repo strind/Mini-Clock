@@ -8,7 +8,7 @@ import com.miniclock.core.context.SdJobContext;
 import com.miniclock.core.context.SdJobHelper;
 import com.miniclock.core.enums.RegistryConfig;
 import com.miniclock.core.executor.SdJobExecutor;
-import com.miniclock.core.lob.SdJobFileAppender;
+import com.miniclock.core.log.SdJobFileAppender;
 import com.miniclock.core.util.FileUtil;
 import com.miniclock.core.util.JdkSerializeTool;
 import org.slf4j.Logger;
@@ -60,39 +60,20 @@ public class TriggerCallbackThread {
             return;
         }
         //启动回调线程
-        triggerCallbackThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while(!toStop){
-                    try {
-                        //从回调任务队列中取出一个回调的信息对象
-                        HandleCallbackParam callback = getInstance().callBackQueue.take();
-                        if (callback != null) {
-                            List<HandleCallbackParam> callbackParamList = new ArrayList<>();
-                            //这里的意思就是说，如果回调的任务队列中有待回调的数据，就把所有数据转移到一个集合中
-                            //并且返回有多少条要回调的数据
-                            //注意，执行drainTo方法的时候，回调队列中的数据也都被清除了
-                            int drainToNum = getInstance().callBackQueue.drainTo(callbackParamList);
-                            //回调的时候，自然也是批量回调
-                            callbackParamList.add(callback);
-                            if (callbackParamList!=null && callbackParamList.size()>0) {
-                                //在这里执行回调给调度中心的操作
-                                doCallback(callbackParamList);
-                            }
-                        }
-                    } catch (Exception e) {
-                        if (!toStop) {
-                            logger.error(e.getMessage(), e);
-                        }
-                    }
-                }
+        triggerCallbackThread = new Thread(() -> {
+            while(!toStop){
                 try {
-                    //走到这里，就意味着退出了循环，其实也就意味着triggerCallbackThread线程要停止工作了
-                    List<HandleCallbackParam> callbackParamList = new ArrayList<HandleCallbackParam>();
-                    //这里会再次把回调队列中的所有数据都放到新的集合中
-                    int drainToNum = getInstance().callBackQueue.drainTo(callbackParamList);
-                    if (callbackParamList!=null && callbackParamList.size()>0) {
-                        //最后再回调一次信息给注册中心
+                    //从回调任务队列中取出一个回调的信息对象
+                    HandleCallbackParam callback = getInstance().callBackQueue.take();
+                    if (callback != null) {
+                        List<HandleCallbackParam> callbackParamList = new ArrayList<>();
+                        //这里的意思就是说，如果回调的任务队列中有待回调的数据，就把所有数据转移到一个集合中
+                        //并且返回有多少条要回调的数据
+                        //注意，执行drainTo方法的时候，回调队列中的数据也都被清除了
+                        int drainToNum = getInstance().callBackQueue.drainTo(callbackParamList);
+                        //回调的时候，自然也是批量回调
+                        callbackParamList.add(callback);
+                        //在这里执行回调给调度中心的操作
                         doCallback(callbackParamList);
                     }
                 } catch (Exception e) {
@@ -100,8 +81,22 @@ public class TriggerCallbackThread {
                         logger.error(e.getMessage(), e);
                     }
                 }
-                logger.info(">>>>>>>>>>> sd-job, executor callback thread destroy.");
             }
+            try {
+                //走到这里，就意味着退出了循环，其实也就意味着triggerCallbackThread线程要停止工作了
+                List<HandleCallbackParam> callbackParamList = new ArrayList<>();
+                //这里会再次把回调队列中的所有数据都放到新的集合中
+                getInstance().callBackQueue.drainTo(callbackParamList);
+                if (!callbackParamList.isEmpty()) {
+                    //最后再回调一次信息给注册中心
+                    doCallback(callbackParamList);
+                }
+            } catch (Exception e) {
+                if (!toStop) {
+                    logger.error(e.getMessage(), e);
+                }
+            }
+            logger.info(">>>>>>>>>>> sd-job, executor callback thread destroy.");
         });
         triggerCallbackThread.setDaemon(true);
         triggerCallbackThread.setName("sd-job, executor TriggerCallbackThread");
@@ -109,29 +104,26 @@ public class TriggerCallbackThread {
 
 
         //启动重试回调的线程
-        triggerRetryCallbackThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while(!toStop){
-                    try {
-                        //重新回调一次
-                        retryFailCallbackFile();
-                    } catch (Exception e) {
-                        if (!toStop) {
-                            logger.error(e.getMessage(), e);
-                        }
-                    }
-                    try {
-                        //休息30秒再次重试
-                        TimeUnit.SECONDS.sleep(RegistryConfig.BEAT_TIMEOUT);
-                    } catch (InterruptedException e) {
-                        if (!toStop) {
-                            logger.error(e.getMessage(), e);
-                        }
+        triggerRetryCallbackThread = new Thread(() -> {
+            while(!toStop){
+                try {
+                    //重新回调一次
+                    retryFailCallbackFile();
+                } catch (Exception e) {
+                    if (!toStop) {
+                        logger.error(e.getMessage(), e);
                     }
                 }
-                logger.info(">>>>>>>>>>> sd-job, executor retry callback thread destroy.");
+                try {
+                    //休息30秒再次重试
+                    TimeUnit.SECONDS.sleep(RegistryConfig.BEAT_TIMEOUT);
+                } catch (InterruptedException e) {
+                    if (!toStop) {
+                        logger.error(e.getMessage(), e);
+                    }
+                }
             }
+            logger.info(">>>>>>>>>>> sd-job, executor retry callback thread destroy.");
         });
         triggerRetryCallbackThread.setDaemon(true);
         triggerRetryCallbackThread.start();
@@ -207,7 +199,7 @@ public class TriggerCallbackThread {
             SdJobContext.setXxlJobContext(new SdJobContext(
                     -1,
                     null,
-                    logFileName));
+                    logFileName,-1,-1));
             //记录信息到本地日志文件中
             SdJobHelper.log(logContent);
         }
@@ -224,7 +216,7 @@ public class TriggerCallbackThread {
      */
     private void appendFailCallbackFile(List<HandleCallbackParam> callbackParamList){
         //判空校验
-        if (callbackParamList==null || callbackParamList.size()==0) {
+        if (callbackParamList==null || callbackParamList.isEmpty()) {
             return;
         }
         //把回调数据序列化

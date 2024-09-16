@@ -7,7 +7,7 @@ import com.miniclock.core.glue.GlueFactory;
 import com.miniclock.core.glue.GlueTypeEnum;
 import com.miniclock.core.handler.IJobHandler;
 import com.miniclock.core.handler.impl.GlueJobHandler;
-import com.miniclock.core.lob.SdJobFileAppender;
+import com.miniclock.core.log.SdJobFileAppender;
 import com.miniclock.core.thread.JobThread;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

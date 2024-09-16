@@ -3,11 +3,12 @@ package com.miniclock.core.executor;
 import com.miniclock.core.biz.AdminBiz;
 import com.miniclock.core.biz.client.AdminBizClient;
 import com.miniclock.core.handler.IJobHandler;
-import com.miniclock.core.lob.SdJobFileAppender;
+import com.miniclock.core.log.SdJobFileAppender;
 import com.miniclock.core.server.EmbedServer;
-import com.miniclock.core.handler.impl.JobHandler;
+import com.miniclock.core.handler.impl.MethodJobHandler;
 import com.miniclock.core.handler.annotation.SdJob;
 import com.miniclock.core.thread.JobThread;
+import com.miniclock.core.thread.SdLogFileCleanThread;
 import com.miniclock.core.thread.TriggerCallbackThread;
 import com.miniclock.core.util.IpUtil;
 import com.miniclock.core.util.NetUtil;
@@ -93,11 +94,11 @@ public class SdJobExecutor {
             }
         }
 
-        regisJobHandler(jobName,new JobHandler(bean,method, initMethod,destroyMethod));
+        regisJobHandler(jobName,new MethodJobHandler(bean,method, initMethod,destroyMethod));
     }
 
-    private void regisJobHandler(String name, JobHandler jobHandler) {
-        jobHandlerMap.put(name,jobHandler);
+    private void regisJobHandler(String name, MethodJobHandler methodJobHandler) {
+        jobHandlerMap.put(name, methodJobHandler);
     }
 
     public static IJobHandler loadJobHandler(String name){
@@ -136,7 +137,7 @@ public class SdJobExecutor {
         // 初始化所有的调度中心Client，用于向调度中心发送请求
         initAdminBizList(adminAddress, accessToken);
         //该组件的功能是用来清除执行器端的过期日志的
-        JobLogFileCleanThread.getInstance().start(logRetentionDays);
+        SdLogFileCleanThread.getInstance().start(logRetentionDays);
 
         //启动回调执行结果信息给调度中心的组件
         TriggerCallbackThread.getInstance().start();
@@ -182,7 +183,7 @@ public class SdJobExecutor {
         }
         //清空缓存jobHandler的Map
         jobHandlerRepository.clear();
-        JobLogFileCleanThread.getInstance().toStop();
+        SdLogFileCleanThread.getInstance().toStop();
         TriggerCallbackThread.getInstance().toStop();
     }
 

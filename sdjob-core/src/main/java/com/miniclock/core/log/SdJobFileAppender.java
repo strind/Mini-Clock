@@ -1,4 +1,4 @@
-package com.miniclock.core.lob;
+package com.miniclock.core.log;
 
 import com.miniclock.core.biz.model.LogResult;
 import org.slf4j.Logger;
@@ -62,11 +62,10 @@ public class SdJobFileAppender {
         if (!logFilePath.exists()) {
             logFilePath.mkdir();
         }
-        String logFileName = logFilePath.getPath()
+        return logFilePath.getPath()
             .concat(File.separator)
             .concat(String.valueOf(logId))
             .concat(".log");
-        return logFileName;
     }
 
 

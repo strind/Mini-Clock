@@ -2,8 +2,7 @@ package com.miniclock.core.server;
 
 import com.miniclock.core.biz.ExecutorBiz;
 import com.miniclock.core.biz.impl.ExecutorBizImpl;
-import com.miniclock.core.biz.model.ReturnT;
-import com.miniclock.core.biz.model.TriggerParam;
+import com.miniclock.core.biz.model.*;
 import com.miniclock.core.thread.ExecutorRegistryThread;
 import com.miniclock.core.util.GsonTool;
 import com.miniclock.core.util.SdJobRemotingUtil;
@@ -14,6 +13,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.http.*;
+import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.handler.timeout.IdleStateHandler;
 import io.netty.util.CharsetUtil;
 import io.netty.util.internal.ThrowableUtil;
@@ -118,7 +118,7 @@ public class EmbedServer {
         private ExecutorBiz executorBiz;
 
         private String accessToken;
-        private ThreadPoolExecutor bizThreadPool = null;
+        private ThreadPoolExecutor bizThreadPool;
         public EmbedHttpServerHandler(ExecutorBiz executorBiz, String accessToken, ThreadPoolExecutor bizThreadPool) {
             this.accessToken = accessToken;
             this.executorBiz =  executorBiz;
@@ -179,9 +179,28 @@ public class EmbedServer {
             }
             try {
                 switch (uri){
+                    //这里触发的就是心跳检测，判断执行器这一端是否启动了
+                    case "/beat":
+                        return executorBiz.beat();
+                    case "/idleBeat":
+                        //这里就是判断调度中心要调度的任务是否可以顺利执行，其实就是判断该任务是否正在被
+                        //执行器这一端执行或者在执行器的队列中，如果在的话，说明当前执行器比较繁忙
+                        IdleBeatParam idleBeatParam = GsonTool.fromJson(requestData, IdleBeatParam.class);
+                        return executorBiz.idleBeat(idleBeatParam);
                     case "/run":
+                        //run就意味着是要执行定时任务
+                        //把requestData转化成触发器参数对象，也就是TriggerParam对象
                         TriggerParam triggerParam = GsonTool.fromJson(requestData, TriggerParam.class);
+                        //然后交给ExecutorBizImpl对象去执行定时任务
                         return executorBiz.run(triggerParam);
+                    //走到这个分支就意味着要终止任务
+                    case "/kill":
+                        KillParam killParam = GsonTool.fromJson(requestData, KillParam.class);
+                        return executorBiz.kill(killParam);
+                    case "/log":
+                        //远程访问执行器端日志
+                        LogParam logParam = GsonTool.fromJson(requestData, LogParam.class);
+                        return executorBiz.log(logParam);
                     default:
                         return new ReturnT<String>(ReturnT.FAIL_CODE, "invalid request, uri-mapping(" + uri + ") not found.");
                 }
@@ -190,6 +209,30 @@ public class EmbedServer {
                 return new ReturnT<String>(ReturnT.FAIL_CODE,"request error: " + ThrowableUtil.stackTraceToString(e));
             }
 
+        }
+
+        /**
+         * Netty中入站处理器的方法的回调
+         */
+        @Override
+        public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
+            ctx.flush();
+        }
+
+        @Override
+        public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+            logger.error(">>>>>>>>>>> xxl-job provider netty_http server caught exception", cause);
+            ctx.close();
+        }
+
+        @Override
+        public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+            if (evt instanceof IdleStateEvent) {
+                ctx.channel().close();
+                logger.debug(">>>>>>>>>>> xxl-job provider netty_http server close an idle channel.");
+            } else {
+                super.userEventTriggered(ctx, evt);
+            }
         }
     }
 
