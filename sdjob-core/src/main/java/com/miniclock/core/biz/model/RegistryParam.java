@@ -1,7 +1,6 @@
 package com.miniclock.core.biz.model;
 
 import java.io.Serializable;
-import java.util.List;
 
 /**
  * @author strind
@@ -18,12 +17,12 @@ public class RegistryParam implements Serializable {
     // 执行器的唯一标识
     private String registryKey;
     // 执行器地址
-    private String getRegistryValue;
+    private String registryValue;
 
     public RegistryParam(String registryGroup, String registryKey, String getRegistryValue) {
         this.registryGroup = registryGroup;
         this.registryKey = registryKey;
-        this.getRegistryValue = getRegistryValue;
+        this.registryValue = getRegistryValue;
     }
 
     public String getRegistryGroup() {
@@ -42,12 +41,12 @@ public class RegistryParam implements Serializable {
         this.registryKey = registryKey;
     }
 
-    public String getGetRegistryValue() {
-        return getRegistryValue;
+    public String getRegistryValue() {
+        return registryValue;
     }
 
-    public void setGetRegistryValue(String getRegistryValue) {
-        this.getRegistryValue = getRegistryValue;
+    public void setRegistryValue(String registryValue) {
+        this.registryValue = registryValue;
     }
 
     @Override
@@ -55,7 +54,7 @@ public class RegistryParam implements Serializable {
         return "RegistryParam{" +
             "registryGroup='" + registryGroup + '\'' +
             ", registryKey='" + registryKey + '\'' +
-            ", getRegistryValue='" + getRegistryValue + '\'' +
+            ", getRegistryValue='" + registryValue + '\'' +
             '}';
     }
 }

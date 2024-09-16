@@ -1,8 +1,7 @@
 package com.miniclock.core.biz.client;
 
 import com.miniclock.core.biz.ExecutorBiz;
-import com.miniclock.core.biz.model.ReturnT;
-import com.miniclock.core.biz.model.TriggerParam;
+import com.miniclock.core.biz.model.*;
 import com.miniclock.core.util.SdJobRemotingUtil;
 
 /**
@@ -31,6 +30,26 @@ public class ExecutorBizClient implements ExecutorBiz {
     @Override
     public ReturnT<String> run(TriggerParam triggerParam) {
         return SdJobRemotingUtil.postBody(addressUrl + "run", accessToken, timeout, triggerParam, ReturnT.class);
+    }
+
+    @Override
+    public ReturnT<String> idleBeat(IdleBeatParam idleBeatParam) {
+        return SdJobRemotingUtil.postBody(addressUrl+"idleBeat", accessToken, timeout, idleBeatParam, ReturnT.class);
+    }
+
+    @Override
+    public ReturnT<String> beat() {
+        return SdJobRemotingUtil.postBody(addressUrl+"beat", accessToken, timeout, "", ReturnT.class);
+    }
+
+    @Override
+    public ReturnT<String> kill(KillParam killParam) {
+        return SdJobRemotingUtil.postBody(addressUrl + "kill", accessToken, timeout, killParam, ReturnT.class);
+    }
+
+    @Override
+    public ReturnT<LogResult> log(LogParam logParam) {
+        return SdJobRemotingUtil.postBody(addressUrl + "log", accessToken, timeout, logParam, ReturnT.class);
     }
 
 }

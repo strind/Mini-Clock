@@ -1,8 +1,6 @@
 package com.miniclock.core.biz;
 
-import com.miniclock.core.biz.model.IdleBeatParam;
-import com.miniclock.core.biz.model.ReturnT;
-import com.miniclock.core.biz.model.TriggerParam;
+import com.miniclock.core.biz.model.*;
 
 /**
  * @author strind
@@ -15,4 +13,11 @@ public interface ExecutorBiz {
     ReturnT<String> run(TriggerParam triggerParam);
 
     ReturnT<String> idleBeat(IdleBeatParam idleBeatParam);
+
+    ReturnT<String> beat();
+
+    ReturnT<String> kill(KillParam killParam);
+
+    ReturnT<LogResult> log(LogParam logParam);
+
 }

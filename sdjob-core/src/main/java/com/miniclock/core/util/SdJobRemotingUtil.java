@@ -70,7 +70,7 @@ public class SdJobRemotingUtil {
     /**
      * 发送post消息
      */
-    public static ReturnT<String> postBody(String url, String accessToken, int timeout, Object requestObj, Class<ReturnT> returnTargClassOfT) {
+    public static ReturnT postBody(String url, String accessToken, int timeout, Object requestObj, Class<ReturnT> returnTargClassOfT) {
         CloseableHttpClient httpClient = null;
         CloseableHttpResponse response = null;
 

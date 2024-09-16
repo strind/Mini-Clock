@@ -2,15 +2,10 @@ package com.miniclock.admin.core.thread;
 
 import com.miniclock.admin.core.conf.SdJobAdminConfig;
 import com.miniclock.admin.core.model.SdJobGroup;
-import com.miniclock.admin.core.model.SdJobInfo;
 import com.miniclock.admin.core.model.SdJobRegistry;
-import com.miniclock.admin.core.route.ExecutorRouteStrategyEnum;
-import com.miniclock.admin.core.schedule.MisfireStrategyEnum;
-import com.miniclock.admin.core.schedule.ScheduleTypeEnum;
 import com.miniclock.core.enums.RegistryConfig;
 import com.miniclock.core.biz.model.RegistryParam;
 import com.miniclock.core.biz.model.ReturnT;
-import com.miniclock.core.glue.GlueTypeEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
@@ -140,15 +135,15 @@ public class JobRegistryHelper {
     public ReturnT<String> registry(RegistryParam registryParam){
         if (!StringUtils.hasText(registryParam.getRegistryGroup())
         || !StringUtils.hasText(registryParam.getRegistryKey())
-        || !StringUtils.hasText(registryParam.getGetRegistryValue())){
+        || !StringUtils.hasText(registryParam.getRegistryValue())){
             return new ReturnT<String>(ReturnT.FAIL_CODE, "Illegal Argument");
         }
         registryOrRemoveThreadPool.execute(()->{
             // 先进行更新操作
-            int ret = SdJobAdminConfig.getAdminConfig().getJobRegistryMapper().registryUpdate(registryParam.getRegistryGroup(), registryParam.getRegistryKey(),registryParam.getGetRegistryValue(), new Date());
+            int ret = SdJobAdminConfig.getAdminConfig().getJobRegistryMapper().registryUpdate(registryParam.getRegistryGroup(), registryParam.getRegistryKey(),registryParam.getRegistryValue(), new Date());
             if (ret < 1){
                 // 更新失败，说明数据不存在，插入新数据
-                SdJobAdminConfig.getAdminConfig().getJobRegistryMapper().registrySave(registryParam.getRegistryGroup(), registryParam.getRegistryKey(),registryParam.getGetRegistryValue(), new Date());
+                SdJobAdminConfig.getAdminConfig().getJobRegistryMapper().registrySave(registryParam.getRegistryGroup(), registryParam.getRegistryKey(),registryParam.getRegistryValue(), new Date());
                 freshGroupRegistryInfo(registryParam);
             }
         });
@@ -163,12 +158,12 @@ public class JobRegistryHelper {
     public ReturnT<String> registryRemove(RegistryParam registryParam){
         if (!StringUtils.hasText(registryParam.getRegistryGroup())
             || !StringUtils.hasText(registryParam.getRegistryKey())
-            || !StringUtils.hasText(registryParam.getGetRegistryValue())){
+            || !StringUtils.hasText(registryParam.getRegistryValue())){
             return new ReturnT<>(ReturnT.FAIL_CODE, "Illegal Argument");
         }
         registryOrRemoveThreadPool.execute(()->{
             // 直接删除
-            int ret = SdJobAdminConfig.getAdminConfig().getJobRegistryMapper().registryDelete(registryParam.getRegistryGroup(), registryParam.getRegistryKey(),registryParam.getGetRegistryValue());
+            int ret = SdJobAdminConfig.getAdminConfig().getJobRegistryMapper().registryDelete(registryParam.getRegistryGroup(), registryParam.getRegistryKey(),registryParam.getRegistryValue());
             if (ret > 0){
                 freshGroupRegistryInfo(registryParam);
             }
