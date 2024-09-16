@@ -15,7 +15,7 @@ import java.util.Date;
 /**
  * 对日志进行处理
  */
-public class XxlJobHelper {
+public class SdJobHelper {
 
     /**
      * 获取定时任务的id

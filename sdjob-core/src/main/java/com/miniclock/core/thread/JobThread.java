@@ -1,9 +1,8 @@
 package com.miniclock.core.thread;
 
 import com.miniclock.core.biz.model.HandleCallbackParam;
-import com.miniclock.core.content.XxlJobHelper;
+import com.miniclock.core.content.SdJobHelper;
 import com.miniclock.core.context.SdJobContext;
-import com.miniclock.core.context.SdJobHelper;
 import com.miniclock.core.executor.SdJobExecutor;
 import com.miniclock.core.handler.IJobHandler;
 import com.miniclock.core.handler.impl.MethodJobHandler;
@@ -115,10 +114,10 @@ public class JobThread extends Thread {
                             //最多等待用户设置的超时时间
                             Boolean tempResult = futureTask.get(triggerParam.getExecutorTimeout(), TimeUnit.SECONDS);
                         } catch (TimeoutException e) {
-                            XxlJobHelper.log("<br>----------- sd-job job execute timeout");
-                            XxlJobHelper.log(e);
+                            SdJobHelper.log("<br>----------- sd-job job execute timeout");
+                            SdJobHelper.log(e);
                             //超时直接设置任务执行超时
-                            XxlJobHelper.handleTimeout("job execute timeout ");
+                            SdJobHelper.handleTimeout("job execute timeout ");
                         } finally {
                             futureThread.interrupt();
                         }
@@ -127,7 +126,7 @@ public class JobThread extends Thread {
                         jobHandler.execute();
                     }
                     if (SdJobContext.getInstance().getHandleCode() <= 0) {
-                        SdJobHelper.handleFail("job handle result lost.");
+                        com.miniclock.core.context.SdJobHelper.handleFail("job handle result lost.");
                     } else {
                         //走到这里意味着定时任务执行成功了，从定时任务上下文中取出执行的结果信息
                         String tempHandleMsg = SdJobContext.getInstance().getHandleMsg();
@@ -140,7 +139,7 @@ public class JobThread extends Thread {
                         SdJobContext.getInstance().setHandleMsg(tempHandleMsg);
                     }
                     //把结果存储到对应的日志文件中
-                    SdJobHelper.log(
+                    com.miniclock.core.context.SdJobHelper.log(
                         "<br>----------- xxl-job job execute end(finish) -----------<br>----------- Result: handleCode="
                             + SdJobContext.getInstance().getHandleCode()
                             + ", handleMsg = "
@@ -158,15 +157,15 @@ public class JobThread extends Thread {
             } catch (Throwable e) {
                 if (toStop) {
                     //如果线程停止了，就记录线程停止的日志到定时任务对应的日志文件中
-                    SdJobHelper.log("<br>----------- JobThread toStop, stopReason:" + stopReason);
+                    com.miniclock.core.context.SdJobHelper.log("<br>----------- JobThread toStop, stopReason:" + stopReason);
                     //下面就是将异常信息记录到日志文件中的操作，因为这些都是在catch中执行的
                     //就意味着肯定有异常了，所以要记录异常信息
                     StringWriter stringWriter = new StringWriter();
                     e.printStackTrace(new PrintWriter(stringWriter));
                     String errorMsg = stringWriter.toString();
-                    SdJobHelper.handleFail(errorMsg);
+                    com.miniclock.core.context.SdJobHelper.handleFail(errorMsg);
                     //在这里记录异常信息到日志文件中
-                    SdJobHelper.log("<br>----------- JobThread Exception:" + errorMsg + "<br>----------- sd-job job execute end(error) -----------");
+                    com.miniclock.core.context.SdJobHelper.log("<br>----------- JobThread Exception:" + errorMsg + "<br>----------- sd-job job execute end(error) -----------");
                 }
             }finally {
                 // 结果回调给调度中心
