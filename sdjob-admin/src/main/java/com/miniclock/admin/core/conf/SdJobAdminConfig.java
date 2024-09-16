@@ -1,10 +1,8 @@
 package com.miniclock.admin.core.conf;
 
+import com.miniclock.admin.core.alarm.JobAlarmer;
 import com.miniclock.admin.core.schedule.SdJobScheduler;
-import com.miniclock.admin.mapper.SdJobGroupMapper;
-import com.miniclock.admin.mapper.SdJobInfoMapper;
-import com.miniclock.admin.mapper.SdJobLogMapper;
-import com.miniclock.admin.mapper.SdJobRegistryMapper;
+import com.miniclock.admin.mapper.*;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
@@ -42,6 +40,9 @@ public class SdJobAdminConfig implements InitializingBean, DisposableBean {
     private SdJobInfoMapper jobInfoMapper;
 
     @Resource
+    private SdJobLogReportMapper sdJobLogReportMapper;
+
+    @Resource
     private SdJobLogMapper sdJobLogMapper;
 
     //@Resource
@@ -50,7 +51,25 @@ public class SdJobAdminConfig implements InitializingBean, DisposableBean {
     @Resource
     private DataSource dataSource;
 
+    @Resource
+    private JobAlarmer jobAlarmer;
 
+
+    public SdJobLogReportMapper getSdJobLogReportMapper() {
+        return sdJobLogReportMapper;
+    }
+
+    public void setSdJobLogReportMapper(SdJobLogReportMapper sdJobLogReportMapper) {
+        this.sdJobLogReportMapper = sdJobLogReportMapper;
+    }
+
+    public JobAlarmer getJobAlarmer() {
+        return jobAlarmer;
+    }
+
+    public void setJobAlarmer(JobAlarmer jobAlarmer) {
+        this.jobAlarmer = jobAlarmer;
+    }
 
     public SdJobGroupMapper getJobGroupMapper() {
         return jobGroupMapper;
@@ -87,6 +106,9 @@ public class SdJobAdminConfig implements InitializingBean, DisposableBean {
     private int triggerPoolSlowMax;
     @Value("${sd.job.log.retentionDays}")
     private int logRetentionDays;
+
+    @Value("30")
+    private int logretentiondays;
 
     public static void setAdminConfig(SdJobAdminConfig adminConfig) {
         SdJobAdminConfig.adminConfig = adminConfig;
@@ -183,5 +205,12 @@ public class SdJobAdminConfig implements InitializingBean, DisposableBean {
 
     public void setLogRetentionDays(int logRetentionDays) {
         this.logRetentionDays = logRetentionDays;
+    }
+
+    public int getLogretentiondays() {
+        if (logretentiondays < 7) {
+            return -1;
+        }
+        return logretentiondays;
     }
 }

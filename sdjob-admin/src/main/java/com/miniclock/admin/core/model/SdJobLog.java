@@ -27,6 +27,28 @@ public class SdJobLog {
     //触发器任务的响应码
     private int triggerCode;
 
+    //失败重试次数
+    private int executorFailRetryCount;
+
+    //执行器分片参数
+    private String executorShardingParam;
+
+    public String getExecutorShardingParam() {
+        return executorShardingParam;
+    }
+
+    public void setExecutorShardingParam(String executorShardingParam) {
+        this.executorShardingParam = executorShardingParam;
+    }
+
+    public int getExecutorFailRetryCount() {
+        return executorFailRetryCount;
+    }
+
+    public void setExecutorFailRetryCount(int executorFailRetryCount) {
+        this.executorFailRetryCount = executorFailRetryCount;
+    }
+
     public String getTriggerMsg() {
         return triggerMsg;
     }

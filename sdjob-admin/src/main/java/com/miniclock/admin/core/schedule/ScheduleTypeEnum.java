@@ -9,13 +9,13 @@ package com.miniclock.admin.core.schedule;
 public enum ScheduleTypeEnum {
 
     //不使用任何类型
-    NONE("schedule_type_none"),
+    NONE("none"),
 
     //一般都是用cron表达式
-    CRON("schedule_type_cron"),
+    CRON("cron"),
 
     //按照固定频率
-    FIX_RATE("schedule_type_fix_rate");
+    FIX_RATE("fix_rate");
 
 
     private String title;

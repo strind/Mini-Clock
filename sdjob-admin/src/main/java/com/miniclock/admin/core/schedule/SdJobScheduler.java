@@ -1,9 +1,7 @@
 package com.miniclock.admin.core.schedule;
 
 import com.miniclock.admin.core.conf.SdJobAdminConfig;
-import com.miniclock.admin.core.thread.JobScheduleHelper;
-import com.miniclock.admin.core.thread.JobRegistryHelper;
-import com.miniclock.admin.core.thread.JobTriggerPoolHelper;
+import com.miniclock.admin.core.thread.*;
 import com.miniclock.core.biz.ExecutorBiz;
 import com.miniclock.core.biz.client.ExecutorBizClient;
 import org.slf4j.Logger;
@@ -30,6 +28,13 @@ public class SdJobScheduler {
         JobTriggerPoolHelper.toStart();
         // 初始化注册中心，
         JobRegistryHelper.getInstance().start();
+
+        // 当调度中心调度任务失败的时候，发送邮件警报
+        JobFailMonitorHelper.getInstance().start();
+        //接收执行器回调信息
+        JobCompleteHelper.getInstance().start();
+        //统计定时任务日志的信息，成功失败次数,同时也会清除过期日志
+        JobLogReportHelper.getInstance().start();
         // 开启数据库的扫描
         JobScheduleHelper.getInstance().start();
     }

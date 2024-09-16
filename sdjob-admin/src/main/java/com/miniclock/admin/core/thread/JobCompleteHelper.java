@@ -112,11 +112,11 @@ public class JobCompleteHelper {
                         }
                     }
                 }
-				logger.info(">>>>>>>>>>> xxl-job, JobLosedMonitorHelper stop");
+				logger.info(">>>>>>>>>>> sd-job, JobLosedMonitorHelper stop");
 			}
 		});
 		monitorThread.setDaemon(true);
-		monitorThread.setName("xxl-job, admin JobLosedMonitorHelper");
+		monitorThread.setName("sd-job, admin JobLosedMonitorHelper");
 		monitorThread.start();
 	}
 
@@ -159,16 +159,16 @@ public class JobCompleteHelper {
 		//得到对应的xxljoblog对象
 		SdJobLog log = SdJobAdminConfig.getAdminConfig().getSdJobLogMapper().load(handleCallbackParam.getLogId());
 		if (log == null) {
-			return new ReturnT<String>(ReturnT.FAIL_CODE, "log item not found.");
+			return new ReturnT<>(ReturnT.FAIL_CODE, "log item not found.");
 		}
 		//判断日志对象的处理结果码
 		//因为这个响应码无论是哪种情况都是大于0的，如果大于0了，说明已经回调一次了
 		//如果等于0，说明还没得到回调信息，任务也可能还处于运行中状态
 		if (log.getHandleCode() > 0) {
-			return new ReturnT<String>(ReturnT.FAIL_CODE, "log repeate callback.");
+			return new ReturnT<>(ReturnT.FAIL_CODE, "log repeate callback.");
 		}
 		//拼接信息
-		StringBuffer handleMsg = new StringBuffer();
+		StringBuilder handleMsg = new StringBuilder();
 		if (log.getHandleMsg()!=null) {
 			handleMsg.append(log.getHandleMsg()).append("<br>");
 		}

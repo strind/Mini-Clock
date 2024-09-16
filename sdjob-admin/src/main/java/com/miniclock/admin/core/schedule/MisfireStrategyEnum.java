@@ -9,10 +9,10 @@ package com.miniclock.admin.core.schedule;
 public enum MisfireStrategyEnum {
 
     //默认什么也不做
-    DO_NOTHING("misfire_strategy_do_nothing"),
+    DO_NOTHING("do_nothing"),
 
     //失败后重试一次
-    FIRE_ONCE_NOW("misfire_strategy_fire_once_now");
+    FIRE_ONCE_NOW("fire_once_now");
 
     private String title;
 
