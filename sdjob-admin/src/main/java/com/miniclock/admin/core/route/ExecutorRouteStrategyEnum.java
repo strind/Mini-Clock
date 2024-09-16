@@ -10,9 +10,13 @@ import com.miniclock.admin.core.route.strategy.*;
 public enum ExecutorRouteStrategyEnum {
 
     FIRST("优先选择首个", new ExecutorRouteFirst()),
-    Last("选择最后一个", new ExecutorRouteLast()),
-    Random("随机选一个",new ExecutorRouteRandom()),
-    round("轮询",new ExecutorRouteRound()),
+    LAST("选择最后一个", new ExecutorRouteLast()),
+    RANDOM("随机选一个",new ExecutorRouteRandom()),
+    ROUND("轮询",new ExecutorRouteRound()),
+    CONSISTENT_HASH("一致性哈希", new ExecutorRouteConsistentHash()),
+    LEAST_FREQUENTLY_USED("最不经常使用", new ExecutorRouteLFU()),
+    LEAST_RECENTLY_USED("最近最久未使用", new ExecutorRouteLRU()),
+    BUSYOVER("忙碌转移", new ExecutorRouteBusyover()),
     failover("故障转移",new ExecutorRouteFailover());
 
     ExecutorRouteStrategyEnum(String title, ExecutorRouter router) {

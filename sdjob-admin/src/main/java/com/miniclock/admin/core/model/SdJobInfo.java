@@ -15,13 +15,6 @@ public class SdJobInfo {
     //该定时任务所属的执行器的id
     private int jobGroup;
 
-    public String getJobDesc() {
-        return jobDesc;
-    }
-
-    public void setJobDesc(String jobDesc) {
-        this.jobDesc = jobDesc;
-    }
 
     // 定时任务描述
     private String jobDesc;
@@ -66,6 +59,25 @@ public class SdJobInfo {
 
     // 报警邮件
     private String alarmEmail;
+
+    // 子任务id
+    private String childJobId;
+
+    public String getChildJobId() {
+        return childJobId;
+    }
+
+    public void setChildJobId(String childJobId) {
+        this.childJobId = childJobId;
+    }
+
+    public String getJobDesc() {
+        return jobDesc;
+    }
+
+    public void setJobDesc(String jobDesc) {
+        this.jobDesc = jobDesc;
+    }
 
     public int getId() {
         return id;
