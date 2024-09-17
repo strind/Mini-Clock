@@ -53,12 +53,7 @@ public class SdJobSpringExecutor extends SdJobExecutor implements ApplicationCon
             Map<Method, SdJob> annotationMethod = null;
             try {
                 annotationMethod = MethodIntrospector.selectMethods(bean.getClass(),
-                    new MethodIntrospector.MetadataLookup<SdJob>() {
-                        @Override
-                        public SdJob inspect(Method method) {
-                            return AnnotatedElementUtils.findMergedAnnotation(method, SdJob.class);
-                        }
-                    });
+                    (MethodIntrospector.MetadataLookup<SdJob>) method -> AnnotatedElementUtils.findMergedAnnotation(method, SdJob.class));
             }catch (Throwable e){
                 logger.error("sdJob method-jobHandler resolve error for bean[ {} ]", beanName, e);
             }

@@ -38,25 +38,17 @@ public class JobRegistryHelper {
 
     private volatile boolean toStop = false;
 
-    public void start(){
+    public void  start(){
         registryOrRemoveThreadPool = new ThreadPoolExecutor(
             2,
             10,
             30L,
             TimeUnit.SECONDS,
             new LinkedBlockingQueue<>(2000),
-            new ThreadFactory() {
-                @Override
-                public Thread newThread(Runnable r) {
-                    return new Thread(r, "SdJob, admin JobRegistryHelper-registryOrRemoveThreadPool-" + r.hashCode());
-                }
-            },
-            new RejectedExecutionHandler() {
-                @Override
-                public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
-                    r.run();
-                    logger.warn(">>>>>>>>>>> SdJob, registry or remove too fast, match threadPool rejected handler(run now).");
-                }
+            r -> new Thread(r, "SdJob, admin JobRegistryHelper-registryOrRemoveThreadPool-" + r.hashCode()),
+            (r, executor) -> {
+                r.run();
+                logger.warn(">>>>>>>>>>> SdJob, registry or remove too fast, match threadPool rejected handler(run now).");
             }
         );
         registryMonitorThread = new Thread(()->{

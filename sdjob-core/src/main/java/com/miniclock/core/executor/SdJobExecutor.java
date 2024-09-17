@@ -63,53 +63,56 @@ public class SdJobExecutor {
         Class<?> targetClass = bean.getClass();
         String methodName = method.getName();
         // 定时任务名不能为空
-        if (jobName.trim().length() == 0) {
-            throw new RuntimeException("sdJob Method-jobHandler name invalid for [" + targetClass + "#"+ methodName + "].");
+        if (jobName.trim().isEmpty()) {
+            throw new RuntimeException(
+                "sdJob Method-jobHandler name invalid for [" + targetClass + "#" + methodName + "].");
         }
-        if (loadJobHandler(jobName) != null){
+        if (loadJobHandler(jobName) != null) {
             // 名字冲突
             throw new RuntimeException("sdJob jobHandler[" + jobName + "] naming conflicts");
         }
         method.setAccessible(true);
         Method initMethod = null;
         Method destroyMethod = null;
-        if (!sdJob.init().trim().isEmpty()){
+        if (!sdJob.init().trim().isEmpty()) {
             try {
                 //如果有则使用反射从bean对象中获得相应的初始化方法
                 initMethod = targetClass.getDeclaredMethod(sdJob.init());
                 //设置可访问，因为后续会根据反射调用的
                 initMethod.setAccessible(true);
             } catch (NoSuchMethodException e) {
-                throw new RuntimeException("xxl-job method-jobhandler initMethod invalid, for[" + targetClass + "#" + methodName + "] .");
+                throw new RuntimeException(
+                    "xxl-job method-jobhandler initMethod invalid, for[" + targetClass + "#" + methodName + "] .");
             }
         }
-        if (!sdJob.destroy().trim().isEmpty()){
+        if (!sdJob.destroy().trim().isEmpty()) {
             try {
                 //如果有则使用反射从bean对象中获得相应的初始化方法
                 destroyMethod = targetClass.getDeclaredMethod(sdJob.destroy());
                 //设置可访问，因为后续会根据反射调用的
                 initMethod.setAccessible(true);
             } catch (NoSuchMethodException e) {
-                throw new RuntimeException("xxl-job method-jobhandler destroyMethod invalid, for[" + targetClass + "#" + methodName + "] .");
+                throw new RuntimeException(
+                    "xxl-job method-jobhandler destroyMethod invalid, for[" + targetClass + "#" + methodName + "] .");
             }
         }
 
-        regisJobHandler(jobName,new MethodJobHandler(bean,method, initMethod,destroyMethod));
+        regisJobHandler(jobName, new MethodJobHandler(bean, method, initMethod, destroyMethod));
     }
 
     private void regisJobHandler(String name, MethodJobHandler methodJobHandler) {
         jobHandlerMap.put(name, methodJobHandler);
     }
 
-    public static IJobHandler loadJobHandler(String name){
+    public static IJobHandler loadJobHandler(String name) {
         return jobHandlerMap.get(name);
     }
 
-    public static JobThread regisJobThread(int jobId, IJobHandler jobHandler, String removeOldReason){
+    public static JobThread regisJobThread(int jobId, IJobHandler jobHandler, String removeOldReason) {
         JobThread jobThread = new JobThread(jobId, jobHandler);
         jobThread.start();
         JobThread oldJobThread = jobThreadRepository.put(jobId, jobThread);
-        if (oldJobThread != null){
+        if (oldJobThread != null) {
             // 缓存过相同的对象
             oldJobThread.toStop(removeOldReason);
             oldJobThread.interrupt();
@@ -117,9 +120,9 @@ public class SdJobExecutor {
         return jobThread;
     }
 
-    public static JobThread removeJobThread(int jobId, String removeOldReason){
+    public static JobThread removeJobThread(int jobId, String removeOldReason) {
         JobThread oldJobThread = jobThreadRepository.remove(jobId);
-        if (oldJobThread != null){
+        if (oldJobThread != null) {
             oldJobThread.toStop(removeOldReason);
             oldJobThread.interrupt();
             return oldJobThread;
@@ -127,11 +130,11 @@ public class SdJobExecutor {
         return null;
     }
 
-    public static JobThread loadJobThread(int jobId){
+    public static JobThread loadJobThread(int jobId) {
         return jobThreadRepository.get(jobId);
     }
 
-    public void start(){
+    public void start() {
         //初始化日记收集组件，并且把用户设置的存储日记的路径设置到该组件中
         SdJobFileAppender.initLogPath(logPath);
         // 初始化所有的调度中心Client，用于向调度中心发送请求
@@ -141,35 +144,36 @@ public class SdJobExecutor {
 
         //启动回调执行结果信息给调度中心的组件
         TriggerCallbackThread.getInstance().start();
-        initEmbedServer(address,ip, port, appName, accessToken);
+        initEmbedServer(address, ip, port, appName, accessToken);
     }
 
     // 启动执行器内嵌的Netty服务器
     private void initEmbedServer(String address, String ip, int port, String appName, String accessToken) {
-        port = port > 0? port : NetUtil.findAvailablePort(19999);
+        port = port > 0 ? port : NetUtil.findAvailablePort(19999);
         ip = (ip != null && !ip.trim().isEmpty()) ? ip : IpUtil.getIp();
-        if (address == null || address.trim().isEmpty()){
+        if (address == null || address.trim().isEmpty()) {
             String ip_port_address = IpUtil.getIpPort(ip, port);
             address = "http://{ip_port}/".replace("{ip_port}", ip_port_address);
         }
         //校验token
-        if (accessToken==null || accessToken.trim().isEmpty()) {
-            logger.warn(">>>>>>>>>>> xxl-job accessToken is empty. To ensure system security, please set the accessToken.");
+        if (accessToken == null || accessToken.trim().isEmpty()) {
+            logger.warn(
+                ">>>>>>>>>>> xxl-job accessToken is empty. To ensure system security, please set the accessToken.");
         }
 
         embedServer = new EmbedServer();
-        embedServer.start(address,port, appName, accessToken);
+        embedServer.start(address, port, appName, accessToken);
     }
 
     /**
      * 销毁执行器组件的方法
      */
-    public void destroy(){
+    public void destroy() {
         //首先停止内嵌服务器
         stopEmbedServer();
         //停止真正执行定时任务的各个线程
         if (!jobThreadRepository.isEmpty()) {
-            for (Map.Entry<Integer, JobThread> item: jobThreadRepository.entrySet()) {
+            for (Map.Entry<Integer, JobThread> item : jobThreadRepository.entrySet()) {
                 JobThread oldJobThread = removeJobThread(item.getKey(), "web container destroy and kill the job.");
                 if (oldJobThread != null) {
                     try {
@@ -182,7 +186,7 @@ public class SdJobExecutor {
             jobThreadRepository.clear();
         }
         //清空缓存jobHandler的Map
-        jobHandlerRepository.clear();
+        //jobHandlerRepository.clear();
         SdLogFileCleanThread.getInstance().toStop();
         TriggerCallbackThread.getInstance().toStop();
     }
@@ -190,12 +194,12 @@ public class SdJobExecutor {
     // 存放AdminBizClient, 由该对象想调度中心发送注册消息
     private static List<AdminBiz> adminBizList;
 
-    private void initAdminBizList(String adminAddresses, String accessToken){
-        if (adminAddresses != null && !adminAddresses.trim().isEmpty()){
+    private void initAdminBizList(String adminAddresses, String accessToken) {
+        if (adminAddresses != null && !adminAddresses.trim().isEmpty()) {
             for (String address : adminAddresses.trim().split(",")) {
-                if (address != null && !address.trim().isEmpty()){
+                if (address != null && !address.trim().isEmpty()) {
                     AdminBizClient adminBizClient = new AdminBizClient(address.trim(), accessToken);
-                    if (adminBizList == null){
+                    if (adminBizList == null) {
                         adminBizList = new ArrayList<>();
                     }
                     adminBizList.add(adminBizClient);
@@ -205,16 +209,16 @@ public class SdJobExecutor {
     }
 
 
-    public static List<AdminBiz> getAdminBizList(){
+    public static List<AdminBiz> getAdminBizList() {
         return adminBizList;
     }
 
 
     private void stopEmbedServer() {
-        if (embedServer != null){
+        if (embedServer != null) {
             try {
                 embedServer.stop();
-            }catch (Exception e){
+            } catch (Exception e) {
                 logger.error(e.getMessage(), e);
             }
         }

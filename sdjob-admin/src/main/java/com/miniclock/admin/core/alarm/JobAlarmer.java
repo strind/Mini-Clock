@@ -21,7 +21,7 @@ import java.util.Map;
  */
 public class JobAlarmer implements ApplicationContextAware, InitializingBean {
 
-    private static Logger logger = LoggerFactory.getLogger(JobAlarmer.class);
+    private static final Logger logger = LoggerFactory.getLogger(JobAlarmer.class);
     private ApplicationContext applicationContext;
 
     private List<JobAlarm> jobAlarms;

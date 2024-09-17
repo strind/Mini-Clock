@@ -210,7 +210,7 @@ public class JobScheduleHelper {
                             ringItemData.addAll(tmpData);
                         }
                     }
-                    if (ringItemData.size() > 0) {
+                    if (!ringItemData.isEmpty()) {
                         for (Integer id : ringItemData) {
                             // 处理定时任务，交由线程池远程调度这些任务
                             JobTriggerPoolHelper.trigger(id, TriggerTypeEnum.CRON, -1, null, null, null);
@@ -232,11 +232,7 @@ public class JobScheduleHelper {
 
 
     private void pushTimeRing(int ringSecond, int jobId) {
-        List<Integer> data = ringData.get(ringSecond);
-        if (data == null) {
-            data = new ArrayList<>();
-            ringData.put(ringSecond, data);
-        }
+        List<Integer> data = ringData.computeIfAbsent(ringSecond, k -> new ArrayList<>());
         data.add(jobId);
         logger.debug(">>>>>>>>>>> sdJob, schedule push time-ring : " + ringSecond + " = " + Arrays.asList(data));
     }
@@ -268,28 +264,28 @@ public class JobScheduleHelper {
         return null;
     }
 
-//    public static void main(String[] args) {
-//        // 你的cron表达式
-//        String cronExpressionString = "0/5 * * * * ?"; // 每5分钟执行一次
-//
-//        // 创建一个CronExpression实例
-//        CronExpression cronExpression = null;
-//        try {
-//            cronExpression = CronExpression.parse(cronExpressionString);
-//            ZonedDateTime now = ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS);
-//            System.out.println(now);
-//
-//            // 计算下一个执行时间
-//            ZonedDateTime nextExecution = cronExpression.next(now);
-//
-//            assert nextExecution != null;
-//            System.out.println(nextExecution);
-//        } catch (Exception e) {
-//            throw new RuntimeException(e);
-//        }
-//
-//
-//    }
+    public static void main(String[] args) {
+        // 你的cron表达式
+        String cronExpressionString = "0/5 * * * * ?"; // 每5分钟执行一次
+
+        // 创建一个CronExpression实例
+        CronExpression cronExpression = null;
+        try {
+            cronExpression = CronExpression.parse(cronExpressionString);
+            ZonedDateTime now = ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS);
+            System.out.println(now);
+
+            // 计算下一个执行时间
+            ZonedDateTime nextExecution = cronExpression.next(now);
+
+            assert nextExecution != null;
+            System.out.println(nextExecution);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+
+    }
 
     public void toStop() {
         scheduleThreadToStop = true;

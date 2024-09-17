@@ -2,6 +2,7 @@ package com.miniclock.admin.mapper;
 
 
 import com.miniclock.admin.core.model.SdJobLog;
+import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
