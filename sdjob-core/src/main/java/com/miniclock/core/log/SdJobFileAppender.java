@@ -26,7 +26,7 @@ public class SdJobFileAppender {
 
     // 初始化存储日志文件路径
     public static void initLogPath(String logPath){
-        if (logPath!=null && logPath.trim().length()>0) {
+        if (logPath!=null && !logPath.trim().isEmpty()) {
             logBasePath = logPath;
         }
         File logPathDir = new File(logBasePath);

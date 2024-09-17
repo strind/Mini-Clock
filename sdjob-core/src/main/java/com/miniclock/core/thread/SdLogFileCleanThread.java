@@ -18,20 +18,22 @@ public class SdLogFileCleanThread {
 
     //创建单例对象
     private static SdLogFileCleanThread instance = new SdLogFileCleanThread();
+
     //把对象暴露出去
-    public static SdLogFileCleanThread getInstance(){
+    public static SdLogFileCleanThread getInstance() {
         return instance;
     }
+
     //工作线程
     private Thread localThread;
     //判断线程是否停止工作
     private volatile boolean toStop = false;
 
 
-    public void start(final long logRetentionDays){
+    public void start(final long logRetentionDays) {
         //logRetentionDays为用户在配置文件设定的日志过期时间
         //这里有个判断，如果日志过期时间少于3天就直接退出
-        if (logRetentionDays < 3 ) {
+        if (logRetentionDays < 3) {
             return;
         }
         localThread = new Thread(() -> {
@@ -39,22 +41,21 @@ public class SdLogFileCleanThread {
                 try {
                     //得到该路径下的所有日志文件
                     File[] childDirs = new File(SdJobFileAppender.getLogPath()).listFiles();
-                    if (childDirs!=null && childDirs.length>0) {
-                        //判断日志文件数组非空
+                    if (childDirs != null && childDirs.length > 0) {
                         //得到当前时间
                         Calendar todayCal = Calendar.getInstance();
                         //设置日期
-                        todayCal.set(Calendar.HOUR_OF_DAY,0);
+                        todayCal.set(Calendar.HOUR_OF_DAY, 0);
                         //设置分钟
-                        todayCal.set(Calendar.MINUTE,0);
+                        todayCal.set(Calendar.MINUTE, 0);
                         //设置秒
-                        todayCal.set(Calendar.SECOND,0);
+                        todayCal.set(Calendar.SECOND, 0);
                         //设置毫秒
-                        todayCal.set(Calendar.MILLISECOND,0);
+                        todayCal.set(Calendar.MILLISECOND, 0);
                         //得到零点时间
                         Date todayDate = todayCal.getTime();
                         //遍历日志文件
-                        for (File childFile: childDirs) {
+                        for (File childFile : childDirs) {
                             //如果不是文件夹就跳过这次循环，因为现在找到的都是文件夹，文件夹的名称是定时任务执行的年月日时间
                             //比如，2023-06-30，2023-07-02等等，每个时间都是一个文件夹，文件夹中有很多个日志文件，文件名称就是定时任务的ID
                             if (!childFile.isDirectory()) {
@@ -62,7 +63,7 @@ public class SdLogFileCleanThread {
                             }
                             //判断文件夹中是否有-符号，根据我上面举的例子，显然有文件夹的名称中有-符号
                             //如果没有则跳过这个文件夹
-                            if (childFile.getName().indexOf("-") == -1) {
+                            if (!childFile.getName().contains("-")) {
                                 continue;
                             }
                             //该变量就用来记录日志文件的创建时间，其实就是文件夹的名字
@@ -78,7 +79,8 @@ public class SdLogFileCleanThread {
                                 continue;
                             }
                             //计算刚才得到的今天的零点时间减去日志文件创建的时间是否大于了用户设定的日志过期时间
-                            if ((todayDate.getTime()-logFileCreateDate.getTime()) >= logRetentionDays * (24 * 60 * 60 * 1000) ) {
+                            if ((todayDate.getTime() - logFileCreateDate.getTime()) >= logRetentionDays * (24 * 60 * 60
+                                * 1000)) {
                                 //如果超过了就把过期的日志删除了
                                 FileUtil.deleteRecursively(childFile);
                             }
@@ -105,7 +107,6 @@ public class SdLogFileCleanThread {
         localThread.setName("sd-job, executor JobLogFileCleanThread");
         localThread.start();
     }
-
 
 
     /**

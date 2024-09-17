@@ -152,13 +152,13 @@ public class SdJobExecutor {
         port = port > 0 ? port : NetUtil.findAvailablePort(19999);
         ip = (ip != null && !ip.trim().isEmpty()) ? ip : IpUtil.getIp();
         if (address == null || address.trim().isEmpty()) {
-            String ip_port_address = IpUtil.getIpPort(ip, port);
-            address = "http://{ip_port}/".replace("{ip_port}", ip_port_address);
+            String IPPortAddress = IpUtil.getIpPort(ip, port);
+            address = "http://{ip_port}/".replace("{ip_port}", IPPortAddress);
         }
         //校验token
         if (accessToken == null || accessToken.trim().isEmpty()) {
             logger.warn(
-                ">>>>>>>>>>> xxl-job accessToken is empty. To ensure system security, please set the accessToken.");
+                ">>>>>>>>>>> sd-job accessToken is empty. To ensure system security, please set the accessToken.");
         }
 
         embedServer = new EmbedServer();

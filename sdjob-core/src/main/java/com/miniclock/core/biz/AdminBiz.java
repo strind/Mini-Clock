@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * @author strind
  * @date 2024/8/24 9:40
- * @description 程序内部使用的接口，该接口是调度中心暴露给执行器那一端的
+ * @description 程序内部使用的接口，执行器端使用
  */
 public interface AdminBiz {
 
